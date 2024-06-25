@@ -1,5 +1,5 @@
 name: your_flow
-description: "A new Flutter project."
+description: "YourFlow is a SellersFlow Dashboard app for sellers to manage their products, orders, and customers."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -35,10 +35,14 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
+  english_words: ^4.0.0
+  provider: ^6.1.2
+  fl_chart: ^0.68.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: "^0.13.1"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -88,3 +92,15 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: "AppIcon"
+  image_path_android: "assets/icons_yourflow/android/ic_launcher-web.png"
+  image_path_ios: "assets/icons_yourflow/ios/iTunesArtwork@1x.png"
+  min_sdk_android: 21
+  remove_alpha_ios: true
+  background_color_ios: "#f0f0f0"
+  macos:
+    generate: true
+    image_path: "assets/icons_yourflow/SellersFlow-AppLogo.png"
