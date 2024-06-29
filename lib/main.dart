@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+// import 'package:your_flow/views/settings/widgets/about.dart';
 import 'package:english_words/english_words.dart';
-import 'HomePage/Views/Charts/custom_line_chart.dart';
+import 'views/homepage/home_view.dart';
 
 void main() {
   runApp(const MyApp());
@@ -9,7 +10,6 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -17,16 +17,16 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: "YourFlow",
-        theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.cyan.shade100),
-        ),
-        home: const YFHome(),
+        theme: ThemeData(),
+        darkTheme: ThemeData.dark(),
+        themeMode: ThemeMode.system,
+        home: const HomeView(),
       ),
     );
   }
 }
 
+// This is the state built to be shared across the app
 class MyAppState extends ChangeNotifier {
   var current = WordPair.random();
 
@@ -44,65 +44,5 @@ class MyAppState extends ChangeNotifier {
       favorites.add(current);
     }
     notifyListeners();
-  }
-}
-
-class YFHome extends StatelessWidget {
-  const YFHome({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
-    var pair = appState.current;
-
-    IconData icon;
-    if (appState.favorites.contains(pair)) {
-      icon = Icons.favorite;
-    } else {
-      icon = Icons.favorite_border;
-    }
-
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text('YourFlow'),
-          actions: [
-            IconButton(
-                onPressed: () {},
-                enableFeedback: true,
-                icon: const Icon(Icons.notifications)),
-          ],
-        ),
-        body: Center(
-            child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text("I've got an awesome idea!"),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    appState.getNext();
-                  },
-                  child: const Text('Generate new idea'),
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    appState.toggleFavorite();
-                  },
-                  icon: Icon(icon),
-                  label: const Text('Like'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 50),
-            const FLChart(),
-          ],
-        )));
   }
 }
