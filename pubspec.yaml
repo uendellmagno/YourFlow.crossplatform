@@ -42,7 +42,6 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_launcher_icons: "^0.13.1"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -63,9 +62,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+  assets:
+    - assets/images/256-mac.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
@@ -93,14 +91,24 @@ flutter:
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
 
-flutter_launcher_icons:
-  android: "launcher_icon"
-  ios: "AppIcon"
-  image_path_android: "assets/icons_yourflow/android/ic_launcher-web.png"
-  image_path_ios: "assets/icons_yourflow/ios/iTunesArtwork@1x.png"
-  min_sdk_android: 21
-  remove_alpha_ios: true
-  background_color_ios: "#f0f0f0"
-  macos:
-    generate: true
-    image_path: "assets/icons_yourflow/SellersFlow-AppLogo.png"
+
+### I removed this dependency!
+### I could just do the following:
+
+## flutter_icons:
+### image_path: assets/images/image_path.png
+### android: true
+### ios: true
+
+
+# flutter_launcher_icons:
+#   android: "launcher_icon"
+#   ios: "AppIcon"
+#   image_path_android: "assets/icons_yourflow/android/ic_launcher-web.png"
+#   image_path_ios: "assets/icons_yourflow/ios/iTunesArtwork@1x.png"
+#   min_sdk_android: 21
+#   remove_alpha_ios: true
+#   background_color_ios: "#f0f0f0"
+#   macos:
+#     generate: true
+#     image_path: "assets/icons_yourflow/ios/iTunesArtwork@1x.png"

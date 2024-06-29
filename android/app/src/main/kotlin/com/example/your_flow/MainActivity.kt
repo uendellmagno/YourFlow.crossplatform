@@ -1,4 +1,4 @@
-package com.example.your_flow
+package com.avlasolutions.yourflow
 
 import io.flutter.embedding.android.FlutterActivity
 
