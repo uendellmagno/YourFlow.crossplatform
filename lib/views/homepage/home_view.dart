@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:your_flow/views/homepage/widgets/user_name_provider.dart';
 import 'package:your_flow/views/settings/widgets/about.dart';
 import 'package:your_flow/views/homepage/widgets/Charts/custom_line_chart.dart';
-import 'package:your_flow/main.dart';
+// import 'package:your_flow/main.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
