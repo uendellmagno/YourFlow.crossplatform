@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-// import 'package:your_flow/views/settings/widgets/about.dart';
 import 'package:english_words/english_words.dart';
 import 'views/homepage/home_view.dart';
 
@@ -17,7 +16,9 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: "YourFlow",
-        theme: ThemeData(),
+        theme: ThemeData(
+            useMaterial3: true,
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue)),
         darkTheme: ThemeData.dark(),
         themeMode: ThemeMode.system,
         home: const HomeView(),
@@ -26,7 +27,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// This is the state built to be shared across the app
 class MyAppState extends ChangeNotifier {
   var current = WordPair.random();
 
@@ -45,4 +45,4 @@ class MyAppState extends ChangeNotifier {
     }
     notifyListeners();
   }
-}
+} 
