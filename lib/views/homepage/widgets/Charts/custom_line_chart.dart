@@ -1,6 +1,10 @@
+/// This is the custom line chart widget, it was built to display the line chart in a card widget.
+library;
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
+// This is the boxed line chart widget
 class BoxedLineChart extends StatelessWidget {
   final String? navigationId;
 
@@ -20,6 +24,7 @@ class BoxedLineChart extends StatelessWidget {
   }
 }
 
+// This is the line chart widget
 class FLChart extends StatelessWidget {
   const FLChart({super.key});
 

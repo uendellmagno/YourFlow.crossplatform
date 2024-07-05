@@ -7,11 +7,13 @@ class UserNameView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    // TODO - i want it aligned left
+    return SizedBox(
+      width: double.infinity,
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.only(top: 20.0, bottom: 20.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Text(
               "Hello, $userName",

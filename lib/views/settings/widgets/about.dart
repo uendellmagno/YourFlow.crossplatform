@@ -23,12 +23,6 @@ class AboutView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('YourFlow'),
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Icon(Icons.adaptive.arrow_back),
-        ),
       ),
       body: const YFAboutView(),
     );
