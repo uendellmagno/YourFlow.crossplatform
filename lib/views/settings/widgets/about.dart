@@ -22,7 +22,13 @@ class AboutView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('YourFlow'),
+        title: const Text(
+          'YourFlow',
+          style: TextStyle(
+            fontSize: 18,
+          ),
+        ),
+        centerTitle: true,
       ),
       body: const YFAboutView(),
     );

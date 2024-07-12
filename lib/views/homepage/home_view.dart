@@ -1,13 +1,67 @@
-/// This file was built to display the home view of the application.
-library;
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:your_flow/main.dart';
 import 'package:your_flow/views/homepage/widgets/quick_actions_provider.dart';
 import 'package:your_flow/views/homepage/widgets/user_name_provider.dart';
 import 'package:your_flow/views/homepage/widgets/Charts/custom_line_chart.dart';
-import 'package:your_flow/views/settings/widgets/about.dart';
+import 'package:your_flow/views/notifications/notifications_view.dart';
+import 'package:your_flow/views/settings/settings_view.dart';
 
-// This Class is the main view of the app
+
+// This class is the main screen of MyApp() class
+class MainScreen extends StatelessWidget {
+  const MainScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final appState = Provider.of<MyAppState>(context);
+
+    // List of pages to be displayed
+    List<Widget> pages = [
+      HomeView(),
+      Icon(Icons.adaptive.more_rounded, size: 150),
+      Icon(Icons.person, size: 150),
+      SettingsView(),
+    ];
+
+    return Scaffold(
+      body: pages[appState.currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        enableFeedback: true,
+        currentIndex: appState.currentIndex,
+        onTap: (int newIndex) {
+          appState.setCurrentIndex(newIndex);
+        },
+        items: const [
+          BottomNavigationBarItem(
+            tooltip: "Home",
+            label: 'Home',
+            icon: Icon(Icons.home),
+          ),
+          BottomNavigationBarItem(
+            tooltip: "Sales",
+            label: 'Sales',
+            icon: Icon(Icons.attach_money_rounded),
+          ),
+          BottomNavigationBarItem(
+            tooltip: "Requests",
+            label: 'Requests',
+            icon: Icon(Icons.bubble_chart_rounded),
+          ),
+          BottomNavigationBarItem(
+            tooltip: "Settings",
+            label: 'Settings',
+            icon: Icon(Icons.settings),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// This Class is the HomeView of the app
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
 
@@ -25,13 +79,21 @@ class HomeView extends StatelessWidget {
             floating: true,
             pinned: false,
             snap: true,
-            title: const Text('YourFlow'),
+            title: const Text(
+              'YourFlow',
+              style: TextStyle(
+                fontSize: 18,
+              ),
+            ),
+            centerTitle: true,
             actions: [
               IconButton(
                 onPressed: () {
+                  HapticFeedback.selectionClick();
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const AboutView()),
+                    MaterialPageRoute(
+                        builder: (context) => const NotificationsView()),
                   );
                 },
                 enableFeedback: true,
@@ -52,7 +114,6 @@ class HomeView extends StatelessWidget {
   }
 }
 
-
 // This class is the main view of the HomeView() class
 class YFHomeView extends StatelessWidget {
   const YFHomeView({super.key});
@@ -65,19 +126,31 @@ class YFHomeView extends StatelessWidget {
         children: [
           const UserNameView(),
           const QuickActionsView(),
-          const SizedBox(height: 10),
+          Divider(
+            height: 1,
+            thickness: 1,
+          ),
           Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [],
           ),
-          Wrap(
-            runSpacing: 10,
-            children: [
-              const BoxedLineChart(),
-              const BoxedLineChart(),
-              const BoxedLineChart(),
-              const BoxedLineChart(),
+          GridView(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 0.8,
+              crossAxisSpacing: 7,
+              mainAxisSpacing: 7,
+            ),
+            children: const [
+              BoxedLineChart(defaultVar: "Total Sales"),
+              BoxedLineChart(defaultVar: "Units"),
+              BoxedLineChart(defaultVar: "Price"),
+              BoxedLineChart(defaultVar: "Ads Sales"),
+              BoxedLineChart(defaultVar: "Ads Spend"),
+              BoxedLineChart(defaultVar: "Other"),
             ],
           ),
         ],

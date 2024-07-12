@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:your_flow/views/homepage/home_view.dart';
+import 'package:flutter/services.dart';
 import 'package:your_flow/views/settings/widgets/about.dart';
 
 class QuickActionsView extends StatelessWidget {
@@ -19,27 +19,32 @@ class QuickActionsProvider extends StatelessWidget {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.only(top: 22, bottom: 22, left: 8, right: 8),
         child: Row(
           children: const [
             QuickActionItem(
-              icon: Icons.home,
-              title: 'Home',
-              view: HomeView(),
-            ),
-            QuickActionItem(
-              icon: Icons.shopping_cart,
-              title: 'Cart',
+              icon: Icons.bar_chart_rounded,
+              title: 'Revenue',
               view: AboutView(),
             ),
             QuickActionItem(
-              icon: Icons.favorite,
-              title: 'Favorites',
+              icon: Icons.warehouse_rounded,
+              title: 'Inventory',
               view: AboutView(),
             ),
             QuickActionItem(
-              icon: Icons.settings,
-              title: 'Settings',
+              icon: Icons.airplane_ticket,
+              title: "Shipments",
+              view: AboutView(),
+            ),
+            QuickActionItem(
+              icon: Icons.star,
+              title: 'Reviews',
+              view: AboutView(),
+            ),
+            QuickActionItem(
+              icon: Icons.health_and_safety_rounded,
+              title: 'Health',
               view: AboutView(),
             ),
           ],
@@ -73,6 +78,7 @@ class QuickActionItem extends StatelessWidget {
           ),
         ),
         onPressed: () {
+          HapticFeedback.selectionClick();
           if (view != context.widget) {
             Navigator.push(
               context,
