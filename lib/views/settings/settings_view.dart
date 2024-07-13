@@ -42,39 +42,36 @@ class SettingsListBuilder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<MyAppState>(context);
-    return ListBody(
+    return Column(
       children: [
-        SettingsCard(
-          image: 'https://avatars.githubusercontent.com/u/29775873?v=4',
-          // TODO - Apply api fetch here:
-          title: "JP SantAnna",
-          subtitle: 'View and edit your profile',
-          view: const Text('Profile'),
-          tileType: 'profile',
-        ),
-        SettingsCard(
-          title: 'Settings',
-          subtitle: 'Change your app settings',
-          view: const Text('Settings'),
-          tileType: 'settings',
-        ),
-        SettingsCard(
-          title: 'Help',
-          subtitle: "Get help with the app",
-          view: const Text('Help'),
-          tileType: 'help',
-        ),
-        SettingsCard(
-          title: 'About',
-          subtitle: "Learn more about the app",
-          view: const Text('About'),
-          tileType: 'about',
-          tapGesture: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => AboutView()),
-            );
-          },
+        ListBody(
+          children: [
+            SettingsCard(
+              image: 'https://avatars.githubusercontent.com/u/29775873?v=4',
+              title: appState.userName,
+              subtitle: 'View and edit your profile',
+              view: const Text('Profile'),
+              tileType: 'profile',
+            ),
+            SettingsCard(
+              title: 'Help',
+              subtitle: "Get help with the app",
+              view: const Text('Help'),
+              tileType: 'help',
+            ),
+            SettingsCard(
+              title: 'About',
+              subtitle: "Learn more about the app",
+              view: const Text('About'),
+              tileType: 'about',
+              tapGesture: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AboutView()),
+                );
+              },
+            ),
+          ],
         ),
         SettingsCard(
           title: 'Logout',
@@ -82,34 +79,43 @@ class SettingsListBuilder extends StatelessWidget {
           view: const Text('Logout'),
           tileType: 'logout',
           tapGesture: () {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: const Text('Confirm Logout'),
-                  content: const Text('Are you sure you want to leave?'),
-                  actions: <Widget>[
-                    TextButton(
-                      onPressed: () {
-                        FirebaseAuth.instance.signOut();
-                        Navigator.of(context).pop();
-                        appState.setCurrentIndex(0);
-                      },
-                      child: const Text('Yes'),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text('Cancel'),
-                    ),
-                  ],
-                );
-              },
-            );
+            logoutDialog(context, appState);
           },
         ),
       ],
+    );
+  }
+
+  Future<dynamic> logoutDialog(BuildContext context, MyAppState appState) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Logout'),
+          content: const Text('Are you sure you want to leave?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                FirebaseAuth.instance.signOut();
+                Navigator.of(context).pop();
+                appState.setCurrentIndex(0);
+              },
+              child: const Text('Yes'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.error,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

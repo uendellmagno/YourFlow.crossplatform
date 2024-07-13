@@ -21,7 +21,7 @@ class MyAppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void fetchUserName() async {
+  Future fetchUserName() async {
     try {
       final api = ApiOps();
       final userInfo = await api.userInfo();
@@ -48,8 +48,9 @@ class MyAppState extends ChangeNotifier {
     _greetingText = "${greetings[index]},\n$_userName!";
   }
 
-  void regenerateGreeting() {
+  Future regenerateGreeting() {
     updateGreeting();
     notifyListeners();
+    return Future.value();
   }
 }
