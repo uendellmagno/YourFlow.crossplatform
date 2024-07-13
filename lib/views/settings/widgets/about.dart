@@ -1,9 +1,8 @@
-// This class of finals is used to display the app About information and Legals.
 import 'package:flutter/material.dart';
 
 class AppInformation {
   final String appName = "YourFlow";
-  final String appFullName = "SF YourFlow App";
+  final String appFullName = "SF YourFlow";
   final String appVersionDetail = "Beta Release: 1.0.0";
   final String appVersion = "1.0.0";
   final String appDescription = " I've got an awesome idea!";
@@ -13,7 +12,7 @@ class AppInformation {
     height: 48.0,
   );
   final String appLegal =
-      "All Rights Reserved.\nThis is an AVLA App.\nCreated and Managed for SellersFLow LLC.";
+      "All Rights Reserved®.\nThis is an AVLA App.\nCreated and Managed for SellersFLow LLC ©.";
 }
 
 class AboutView extends StatelessWidget {
@@ -21,24 +20,17 @@ class AboutView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: "YourFlow",
-      theme: ThemeData(),
-      darkTheme: ThemeData.dark(),
-      themeMode: ThemeMode.system,
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('YourFlow'),
-          leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: const Icon(Icons.arrow_back),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'YourFlow',
+          style: TextStyle(
+            fontSize: 18,
           ),
         ),
-        body: const YFAboutView(),
+        centerTitle: true,
       ),
+      body: const YFAboutView(),
     );
   }
 }
@@ -60,27 +52,21 @@ class YFAboutView extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    showAboutDialog(
-                      context: context,
-                      applicationIcon: AppInformation().appIcon,
-                      applicationName: AppInformation().appFullName,
-                      applicationVersion: AppInformation().appVersionDetail,
-                      applicationLegalese: AppInformation().appLegal,
-                    );
-                  },
-                  icon: const Icon(Icons.info),
-                  label: const Text("About us"),
-                ),
-              ),
-            ],
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton.icon(
+              onPressed: () {
+                showAboutDialog(
+                  context: context,
+                  applicationIcon: AppInformation().appIcon,
+                  applicationName: AppInformation().appFullName,
+                  applicationVersion: AppInformation().appVersionDetail,
+                  applicationLegalese: AppInformation().appLegal,
+                );
+              },
+              icon: const Icon(Icons.info),
+              label: const Text("About us"),
+            ),
           ),
         ],
       ),

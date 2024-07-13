@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "556751661372",
+    "project_id": "yourflow-app",
+    "storage_bucket": "yourflow-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:556751661372:android:2006e5f9d4dbf69631d639",
+        "android_client_info": {
+          "package_name": "com.avlasolutions.yourflow"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWJc6p9-kbbRnuEiwlGGShJMQmNYpJfsA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
