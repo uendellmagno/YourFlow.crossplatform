@@ -1,6 +1,3 @@
-/// This is the heart, core and soul of the app. It is the main file that runs the app.
-library;
-
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -8,9 +5,9 @@ import 'package:provider/provider.dart';
 import 'package:your_flow/services/firebase_tools.dart';
 import 'package:your_flow/views/homepage/home_view.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:your_flow/services/app_state_core.dart'; // Import the new file
 import 'firebase_options.dart';
 
-// This is the main function that runs the app
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -19,7 +16,6 @@ void main() async {
   runApp(const MyApp());
 }
 
-// This is the main class of the app
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -31,7 +27,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Defines a custom ColorScheme for light and dark themes.
     final ColorScheme lightColorScheme = ColorScheme.fromSeed(
       seedColor: const Color(0xFF01659F),
     );
@@ -41,7 +36,6 @@ class MyApp extends StatelessWidget {
       brightness: Brightness.dark,
     );
 
-    // This is the main widget of the app
     return ChangeNotifierProvider(
       create: (context) => MyAppState(),
       child: MaterialApp(
@@ -50,7 +44,6 @@ class MyApp extends StatelessWidget {
         theme: lightThemeMethod(lightColorScheme),
         darkTheme: darkThemeMethod(darkColorScheme),
         themeMode: ThemeMode.system,
-        // Authenticator and then, the main screen:
         home: AuthChecker(
           child: MainScreen(),
         ),
@@ -92,17 +85,5 @@ class MyApp extends StatelessWidget {
         unselectedItemColor: darkColorScheme.onSurface.withOpacity(0.70),
       ),
     );
-  }
-}
-
-// This class is the main state of the app
-class MyAppState extends ChangeNotifier {
-  int _currentIndex = 0;
-
-  int get currentIndex => _currentIndex;
-
-  void setCurrentIndex(int index) {
-    _currentIndex = index;
-    notifyListeners();
   }
 }

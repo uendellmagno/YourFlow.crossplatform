@@ -1,8 +1,9 @@
-import 'dart:ui';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:your_flow/services/app_state_core.dart';
+import 'package:your_flow/views/settings/widgets/about.dart';
 
 class SettingsView extends StatelessWidget {
   const SettingsView({super.key});
@@ -11,7 +12,12 @@ class SettingsView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: const Text(
+          'Settings',
+          style: TextStyle(
+            fontSize: 18,
+          ),
+        ),
         centerTitle: true,
       ),
       body: Padding(
@@ -35,11 +41,13 @@ class SettingsListBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appState = Provider.of<MyAppState>(context);
     return ListBody(
       children: [
         SettingsCard(
           image: 'https://avatars.githubusercontent.com/u/29775873?v=4',
-          title: 'Profile',
+          // TODO - Apply api fetch here:
+          title: "JP SantAnna",
           subtitle: 'View and edit your profile',
           view: const Text('Profile'),
           tileType: 'profile',
@@ -51,16 +59,22 @@ class SettingsListBuilder extends StatelessWidget {
           tileType: 'settings',
         ),
         SettingsCard(
-          title: 'About',
-          subtitle: "Learn more about the app",
-          view: const Text('About'),
-          tileType: 'about',
-        ),
-        SettingsCard(
           title: 'Help',
           subtitle: "Get help with the app",
           view: const Text('Help'),
           tileType: 'help',
+        ),
+        SettingsCard(
+          title: 'About',
+          subtitle: "Learn more about the app",
+          view: const Text('About'),
+          tileType: 'about',
+          tapGesture: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AboutView()),
+            );
+          },
         ),
         SettingsCard(
           title: 'Logout',
@@ -73,20 +87,21 @@ class SettingsListBuilder extends StatelessWidget {
               builder: (BuildContext context) {
                 return AlertDialog(
                   title: const Text('Confirm Logout'),
-                  content: const Text('Are you sure you want to logout?'),
+                  content: const Text('Are you sure you want to leave?'),
                   actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        FirebaseAuth.instance.signOut();
+                        Navigator.of(context).pop();
+                        appState.setCurrentIndex(0);
+                      },
+                      child: const Text('Yes'),
+                    ),
                     TextButton(
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
                       child: const Text('Cancel'),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        FirebaseAuth.instance.signOut();
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text('Logout'),
                     ),
                   ],
                 );
@@ -151,22 +166,26 @@ class SettingsCard extends StatelessWidget {
         break;
     }
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0, top: 8.0),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        )),
+        onPressed: () {
+          HapticFeedback.lightImpact();
+          if (tapGesture != null) {
+            tapGesture!();
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('This feature is coming soon! Stay tuned.'),
+              ),
+            );
+          }
+        },
         child: ListTile(
-          onTap: () {
-            HapticFeedback.lightImpact();
-            if (tapGesture != null) {
-              tapGesture!();
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('This feature is coming soon! Stay tuned.'),
-                ),
-              );
-            }
-          },
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
           ),

@@ -1,50 +1,22 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:your_flow/services/app_state_core.dart';
 
-class WelcomeUser extends StatefulWidget {
+class WelcomeUser extends StatelessWidget {
   const WelcomeUser({super.key});
 
   @override
-  WelcomeUserState createState() => WelcomeUserState();
-}
-
-class WelcomeUserState extends State<WelcomeUser> {
-  final List<String> greetings = [
-    "Hello",
-    "Welcome back",
-    "Greetings",
-    "Good day",
-    "Hey",
-    "What's up",
-  ];
-
-  final String userName = "Basics Hardware";
-  String greetingText = "Welcome to\nYourFlow!";
-
-  @override
-  void initState() {
-    super.initState();
-    updateGreeting();
-  }
-
-  void updateGreeting() {
-    final random = Random();
-    final index = random.nextInt(greetings.length);
-    setState(() {
-      greetingText = "${greetings[index]},\n$userName!";
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final appState = Provider.of<MyAppState>(context);
+
     return GestureDetector(
       onTap: () {
         HapticFeedback.lightImpact();
-        updateGreeting();
+        appState.regenerateGreeting();
       },
       child: Text(
-        greetingText,
+        appState.greetingText,
         style: const TextStyle(
           fontSize: 38,
           fontWeight: FontWeight.bold,

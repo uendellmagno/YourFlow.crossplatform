@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:your_flow/main.dart';
+import 'package:your_flow/services/app_state_core.dart';
 import 'package:your_flow/views/homepage/widgets/quick_actions_provider.dart';
 import 'package:your_flow/views/homepage/widgets/user_name_provider.dart';
 import 'package:your_flow/views/homepage/widgets/Charts/custom_line_chart.dart';
 import 'package:your_flow/views/notifications/notifications_view.dart';
+import 'package:your_flow/views/reports/requests_view.dart';
+import 'package:your_flow/views/reports/sales_view.dart';
 import 'package:your_flow/views/settings/settings_view.dart';
-
+import 'package:google_nav_bar/google_nav_bar.dart';
 
 // This class is the main screen of MyApp() class
 class MainScreen extends StatelessWidget {
@@ -20,42 +22,55 @@ class MainScreen extends StatelessWidget {
     // List of pages to be displayed
     List<Widget> pages = [
       HomeView(),
-      Icon(Icons.adaptive.more_rounded, size: 150),
-      Icon(Icons.person, size: 150),
+      SalesView(),
+      RequestsView(),
       SettingsView(),
     ];
 
     return Scaffold(
       body: pages[appState.currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        enableFeedback: true,
-        currentIndex: appState.currentIndex,
-        onTap: (int newIndex) {
-          appState.setCurrentIndex(newIndex);
-        },
-        items: const [
-          BottomNavigationBarItem(
-            tooltip: "Home",
-            label: 'Home',
-            icon: Icon(Icons.home),
-          ),
-          BottomNavigationBarItem(
-            tooltip: "Sales",
-            label: 'Sales',
-            icon: Icon(Icons.attach_money_rounded),
-          ),
-          BottomNavigationBarItem(
-            tooltip: "Requests",
-            label: 'Requests',
-            icon: Icon(Icons.bubble_chart_rounded),
-          ),
-          BottomNavigationBarItem(
-            tooltip: "Settings",
-            label: 'Settings',
-            icon: Icon(Icons.settings),
-          ),
-        ],
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 15,
+          vertical: 20,
+        ),
+        child: GNav(
+          haptic: true, // haptic feedback
+          tabBorderRadius: 15,
+          activeColor: Theme.of(context).primaryColor,
+          tabBackgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
+          duration: const Duration(milliseconds: 300),
+          rippleColor: Theme.of(context).primaryColor.withOpacity(0.1),
+          gap: 8,
+          color: Theme.of(context).appBarTheme.foregroundColor,
+          padding: EdgeInsets.all(16),
+          selectedIndex: appState.currentIndex,
+          onTabChange: (int newIndex) {
+            appState.setCurrentIndex(newIndex);
+          },
+          tabs: [
+            GButton(
+              semanticLabel: "Home",
+              text: 'Home',
+              icon: Icons.home_rounded,
+            ),
+            GButton(
+              semanticLabel: "Sales",
+              text: 'Sales',
+              icon: Icons.attach_money_rounded,
+            ),
+            GButton(
+              semanticLabel: "Requests",
+              text: 'Requests',
+              icon: Icons.bubble_chart_rounded,
+            ),
+            GButton(
+              semanticLabel: "Settings",
+              text: 'Settings',
+              icon: Icons.settings_rounded,
+            ),
+          ],
+        ),
       ),
     );
   }
