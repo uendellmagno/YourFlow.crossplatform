@@ -10,6 +10,7 @@ import 'package:your_flow/views/reports/requests_view.dart';
 import 'package:your_flow/views/reports/sales_view.dart';
 import 'package:your_flow/views/settings/settings_view.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:your_flow/services/api_ops.dart';
 
 // This class is the main screen of MyApp() class
 class MainScreen extends StatelessWidget {
@@ -135,6 +136,8 @@ class YFHomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ApiOps apiOps = ApiOps();
+
     return SingleChildScrollView(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -150,26 +153,101 @@ class YFHomeView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [],
           ),
-          GridView(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.8,
-              crossAxisSpacing: 7,
-              mainAxisSpacing: 7,
+          Padding(
+            padding: const EdgeInsets.only(top: 15, bottom: 15),
+            child: Column(
+              children: [
+                cardsTopHeader(context),
+                cardsView(apiOps),
+              ],
             ),
-            children: const [
-              BoxedLineChart(defaultVar: "Total Sales"),
-              BoxedLineChart(defaultVar: "Units"),
-              BoxedLineChart(defaultVar: "Price"),
-              BoxedLineChart(defaultVar: "Ads Sales"),
-              BoxedLineChart(defaultVar: "Ads Spend"),
-              BoxedLineChart(defaultVar: "Other"),
-            ],
           ),
         ],
       ),
+    );
+  }
+
+  GridView cardsView(ApiOps apiOps) {
+    return GridView(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 0.8,
+        crossAxisSpacing: 7,
+        mainAxisSpacing: 7,
+      ),
+      children: [
+        BoxedLineChart(
+          defaultVar: "Total Sales",
+          fetchData: apiOps.graphsRevenue,
+        ),
+        BoxedLineChart(
+          defaultVar: "Units",
+          fetchData: apiOps.graphsRevenue,
+        ),
+        BoxedLineChart(
+          defaultVar: "Price",
+          fetchData: apiOps.graphsRevenue,
+        ),
+        BoxedLineChart(
+          defaultVar: "Ads Sales",
+          fetchData: apiOps.graphsRevenue,
+        ),
+        BoxedLineChart(
+          defaultVar: "Ads Spend",
+          fetchData: apiOps.graphsRevenue,
+        ),
+        BoxedLineChart(
+          defaultVar: "Other",
+          fetchData: apiOps.graphsRevenue,
+        ),
+      ],
+    );
+  }
+
+  Row cardsTopHeader(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Padding(
+          padding: EdgeInsets.only(left: 15),
+          child: Text(
+            'Overview',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.only(right: 15),
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(8),
+                ),
+              ),
+            ),
+            onPressed: () {
+              HapticFeedback.selectionClick();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SalesView(),
+                ),
+              );
+            },
+            child: Text(
+              'View All',
+              style: TextStyle(
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

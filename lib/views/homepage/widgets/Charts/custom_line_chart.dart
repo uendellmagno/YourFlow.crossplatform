@@ -3,13 +3,29 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 // This is the boxed line chart widget
-class BoxedLineChart extends StatelessWidget {
+class BoxedLineChart extends StatefulWidget {
   final String defaultVar;
+  final Future<Map<String, dynamic>> Function() fetchData;
 
   const BoxedLineChart({
     super.key,
     required this.defaultVar,
+    required this.fetchData,
   });
+
+  @override
+  _BoxedLineChartState createState() => _BoxedLineChartState();
+}
+
+class _BoxedLineChartState extends State<BoxedLineChart> {
+  late Future<Map<String, dynamic>> data;
+
+  @override
+  void initState() {
+    super.initState();
+    data = widget.fetchData();
+    print(data);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +43,7 @@ class BoxedLineChart extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  defaultVar,
+                  widget.defaultVar,
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -49,12 +65,33 @@ class BoxedLineChart extends StatelessWidget {
                       color: Colors.green,
                     ),
                     const SizedBox(width: 4),
-                    const Text(
-                      '72%',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.green,
-                      ),
+                    FutureBuilder<Map<String, dynamic>>(
+                      future: data,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          return const Text(
+                            'Error',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.red,
+                            ),
+                          );
+                        } else {
+                          // Assuming snapshot.data contains a 'percentage' field
+                          double percentage = snapshot.data!['percentage'] ?? 0;
+                          return Text(
+                            '${percentage.toStringAsFixed(2)}%',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color:
+                                  percentage >= 0 ? Colors.green : Colors.red,
+                            ),
+                          );
+                        }
+                      },
                     ),
                   ],
                 ),
@@ -65,7 +102,26 @@ class BoxedLineChart extends StatelessWidget {
           Expanded(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(15),
-              child: const CustomLineChart(),
+              child: FutureBuilder<Map<String, dynamic>>(
+                future: data,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return const Center(child: Text('Error loading data'));
+                  } else {
+                    // Ensure spots is not null and is a List
+                    List<FlSpot> spots =
+                        (snapshot.data!['day']['current'] as Map)
+                            .entries
+                            .map((entry) =>
+                                FlSpot(double.parse(entry.key), entry.value))
+                            .toList();
+
+                    return CustomLineChart(data: spots);
+                  }
+                },
+              ),
             ),
           ),
         ],
@@ -76,8 +132,9 @@ class BoxedLineChart extends StatelessWidget {
 
 // This is the line chart widget
 class CustomLineChart extends StatelessWidget {
-  const CustomLineChart({super.key});
+  final List<FlSpot> data;
 
+  const CustomLineChart({super.key, required this.data});
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -96,15 +153,8 @@ class CustomLineChart extends StatelessWidget {
               borderData: FlBorderData(show: false),
               lineBarsData: [
                 LineChartBarData(
-                  spots: const [
-                    FlSpot(0, 4),
-                    FlSpot(1, 5),
-                    FlSpot(2, 6),
-                    FlSpot(3, 6),
-                    FlSpot(4, 4),
-                    FlSpot(5, 5),
-                    FlSpot(6, 5),
-                    FlSpot(7, 7),
+                  spots: [
+                    ...data,
                   ],
                   color: Theme.of(context).colorScheme.primary,
                   barWidth: 2,

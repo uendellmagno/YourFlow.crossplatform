@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:your_flow/services/firebase_tools.dart';
 import 'package:your_flow/views/homepage/home_view.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:your_flow/services/app_state_core.dart'; // Import the new file
+import 'package:your_flow/services/app_state_core.dart';
 import 'firebase_options.dart';
 
 void main() async {
