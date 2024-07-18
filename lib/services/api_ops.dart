@@ -1,13 +1,15 @@
 import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiOps {
   // This is a local server, you can change it to your own server
-  final String path = "http://192.168.3.209:8000";
+  static String path = "http://192.168.3.209:8000";
 
   Map<String, String> filter = {};
 
+  // This method retrieves the user token
   Future<String> getUserToken() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
@@ -18,10 +20,11 @@ class ApiOps {
         throw Exception("Failed to retrieve token");
       }
     } else {
-      throw Exception("User not authenticated");
+      throw Exception("User not found");
     }
   }
 
+  // This method returns the filter parameters as a string
   String getUrlFilter() {
     var urlResponse = '';
     filter.forEach((key, value) {
@@ -30,7 +33,8 @@ class ApiOps {
     return urlResponse;
   }
 
-  Future<http.Response> mountRequest(String endpoint) async {
+  // This method mounts the request
+  Future<Map<String, dynamic>> mountRequest(String endpoint) async {
     final token = await getUserToken();
     endpoint = '$endpoint/?${getUrlFilter()}';
     final response = await http.get(
@@ -40,15 +44,48 @@ class ApiOps {
         'Content-Type': 'application/json',
       },
     );
-    return response;
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to load data');
+    }
   }
 
+  // delete cache and force refresh data from the server:
+  void forceFreshFetch() async {
+    final pref = await SharedPreferences.getInstance();
+    pref.clear();
+  }
+
+  Future<Map<String, dynamic>> fetchDataWithCaching(
+      String cacheKey, Future<Map<String, dynamic>> Function() fetchFunction,
+      {Duration cacheTimeout = const Duration(minutes: 7)}) async {
+    final pref = await SharedPreferences.getInstance();
+    final cachedData = pref.getString(cacheKey);
+    final cacheTimestamp = pref.getInt('${cacheKey}_timestamp') ?? 0;
+    final currentTimestamp = DateTime.now().millisecondsSinceEpoch;
+
+    if (cachedData != null &&
+        (currentTimestamp - cacheTimestamp) < cacheTimeout.inMilliseconds) {
+      // Return cached data if within cache timeout
+      return json.decode(cachedData) as Map<String, dynamic>;
+    } else {
+      // Fetch fresh data from API
+      final freshData = await fetchFunction();
+      // Store fresh data in cache
+      await pref.setString(cacheKey, json.encode(freshData));
+      await pref.setInt('${cacheKey}_timestamp', currentTimestamp);
+      return freshData;
+    }
+  }
+
+  // This method retrieves the user information
   Future<Map<String, dynamic>> userInfo() async {
     final endpoint = '$path/user-info';
-    final response = await mountRequest(endpoint);
-    return json.decode(response.body);
+    return fetchDataWithCaching('user_info', () => mountRequest(endpoint));
   }
 
+  // This method retrieves the user information for a specific filter
   Future<Map<String, dynamic>> filterInfo(
       Map<String, dynamic> variation) async {
     final query = variation['queryKey'][1] != null
@@ -68,106 +105,110 @@ class ApiOps {
 
   Future<Map<String, dynamic>> mktshareHome() async {
     final endpoint = '$path/home/mktshare';
-    final response = await mountRequest(endpoint);
-    return json.decode(response.body);
+    return fetchDataWithCaching('mktshare_home', () => mountRequest(endpoint));
   }
 
+  // This method retrieves the reviews for the home page
   Future<Map<String, dynamic>> reviewsHome() async {
     final endpoint = '$path/home/reviews';
-    final response = await mountRequest(endpoint);
-    return json.decode(response.body);
+    return fetchDataWithCaching('reviews_home', () => mountRequest(endpoint));
   }
 
+  // This method retrieves the account health for the home page
   Future<Map<String, dynamic>> accHealthHome() async {
     final endpoint = '$path/home/acc-health';
-    final response = await mountRequest(endpoint);
-    return json.decode(response.body);
+    return fetchDataWithCaching('acc_health', () => mountRequest(endpoint));
   }
 
+  // This method retrieves the cards for the home page
   Future<Map<String, dynamic>> cardsHome() async {
     final endpoint = '$path/home/cards';
-    final response = await mountRequest(endpoint);
-    return json.decode(response.body);
+    return fetchDataWithCaching('cards_home', () => mountRequest(endpoint));
   }
 
+  // This method retrieves the cards for the advertising page
   Future<Map<String, dynamic>> cardsAdvertising() async {
     final endpoint = '$path/advertising/cards';
-    final response = await mountRequest(endpoint);
-    return json.decode(response.body);
+    return fetchDataWithCaching('cards_ads', () => mountRequest(endpoint));
   }
 
+  // This method retrieves the cards for the inventory page
   Future<Map<String, dynamic>> cardsInventory() async {
     final endpoint = '$path/inventory/cards';
-    final response = await mountRequest(endpoint);
-    return json.decode(response.body);
+    return fetchDataWithCaching(
+        'cards_inventory', () => mountRequest(endpoint));
   }
 
+  // This method retrieves the cards for the revenue page
   Future<Map<String, dynamic>> cardsRevenue() async {
     final endpoint = '$path/revenue/cards';
-    final response = await mountRequest(endpoint);
-    return json.decode(response.body);
+    return fetchDataWithCaching('cards_revenue', () => mountRequest(endpoint));
   }
 
+  // This method retrieves the home graphs
   Future<Map<String, dynamic>> graphsHome() async {
     final endpoint = '$path/home/graphs';
-    final response = await mountRequest(endpoint);
-    return json.decode(response.body);
+    return fetchDataWithCaching('graphs_home', () => mountRequest(endpoint));
   }
 
+  // This method retrieves the revenue graphs
   Future<Map<String, dynamic>> graphsRevenue() async {
     final endpoint = '$path/revenue/graphs';
-    final response = await mountRequest(endpoint);
-    return json.decode(response.body);
+    return fetchDataWithCaching('graphs_revenue', () => mountRequest(endpoint));
   }
 
+  // This method retrieves the advertising graphs
   Future<Map<String, dynamic>> graphsAdvertising() async {
     final endpoint = '$path/advertising/graphs';
-    final response = await mountRequest(endpoint);
-    return json.decode(response.body);
+    return fetchDataWithCaching('graphs_ads', () => mountRequest(endpoint));
   }
 
+  // This method retrieves the inventory graphs
   Future<Map<String, dynamic>> graphsInventory() async {
     final endpoint = '$path/inventory/graphs';
-    final response = await mountRequest(endpoint);
-    return json.decode(response.body);
+    return fetchDataWithCaching(
+        'graphs_inventory', () => mountRequest(endpoint));
   }
 
+  // This method retrieves the advertising tables
   Future<Map<String, dynamic>> tablesAdvertising() async {
     final endpoint = '$path/advertising/tables';
-    final response = await mountRequest(endpoint);
-    return json.decode(response.body);
+    return fetchDataWithCaching('tables_ads', () => mountRequest(endpoint));
   }
 
+  // This method retrieves the inventory graphs
   Future<Map<String, dynamic>> tablesInventory() async {
     final endpoint = '$path/inventory/tables';
-    final response = await mountRequest(endpoint);
-    return json.decode(response.body);
+    return fetchDataWithCaching(
+        'tables_inventory', () => mountRequest(endpoint));
   }
 
+  // This method retrieves the projections for the revenue page
   Future<Map<String, dynamic>> projection() async {
     final endpoint = '$path/revenue/projection';
-    final response = await mountRequest(endpoint);
-    return json.decode(response.body);
+    return fetchDataWithCaching(
+        'revenue_projection', () => mountRequest(endpoint));
   }
 
+  // This method retrieves the prime day table
   Future<Map<String, dynamic>> primeTable() async {
     final endpoint = '$path/events/prime-day/table';
-    final response = await mountRequest(endpoint);
-    return json.decode(response.body);
+    return fetchDataWithCaching('prime_table', () => mountRequest(endpoint));
   }
 
+  // This method retrieves the prime day cards
   Future<Map<String, dynamic>> primeCards() async {
     final endpoint = '$path/events/prime-day/cards';
-    final response = await mountRequest(endpoint);
-    return json.decode(response.body);
+    return fetchDataWithCaching('prime_cards', () => mountRequest(endpoint));
   }
 
+  // This method retrieves the prime day graph
   Future<Map<String, dynamic>> primeGraph() async {
     final endpoint = '$path/events/prime-day/graph';
-    final response = await mountRequest(endpoint);
-    return json.decode(response.body);
+    return fetchDataWithCaching('prime_graphs', () => mountRequest(endpoint));
   }
 
+  // This method retrieves the home data
   Map<String, Function> homeData(Map<String, String> filter) {
     this.filter = filter;
     return {
@@ -179,6 +220,7 @@ class ApiOps {
     };
   }
 
+  // This method retrieves the revenue data
   Map<String, Function> revenueData(Map<String, String> filter) {
     this.filter = filter;
     return {
@@ -188,6 +230,7 @@ class ApiOps {
     };
   }
 
+  // This method retrieves the marketing data
   Map<String, Function> marketingData(Map<String, String> filter) {
     this.filter = filter;
     return {
@@ -197,6 +240,7 @@ class ApiOps {
     };
   }
 
+  //  This method retrieves the inventory data
   Map<String, Function> inventoryData(Map<String, String> filter) {
     this.filter = filter;
     return {
@@ -206,6 +250,7 @@ class ApiOps {
     };
   }
 
+  // This method retrieves the prime day data
   Map<String, Function> primeData(Map<String, String> filter) {
     this.filter = filter;
     return {
@@ -214,4 +259,7 @@ class ApiOps {
       'prime_graph': primeGraph,
     };
   }
+
+  getChartData(String defaultVar) {}
+  getCurrentData(String defaultVar) {}
 }

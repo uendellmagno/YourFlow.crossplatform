@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:provider/provider.dart';
+import 'package:your_flow/services/app_state_core.dart';
+import 'package:your_flow/services/api_ops.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,6 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _login() async {
     setState(() {
       _isLoading = true;
+      ApiOps().forceFreshFetch();
     });
 
     try {
@@ -24,13 +29,28 @@ class _LoginScreenState extends State<LoginScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-    } on FirebaseAuthException {
-      // Handle login errors here
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Something went wrong. Please try again.')),
-        );
+      final appState = Provider.of<MyAppState>(context, listen: false);
+      await appState.fetchUserName();
+      await appState.regenerateGreeting();
+    } on FirebaseAuthException catch (e) {
+      String errorMessage;
+      switch (e.code) {
+        case 'invalid-email':
+          errorMessage = 'The email address is badly formatted.';
+          break;
+        case 'user-not-found':
+          errorMessage = 'No user found with this email.';
+          break;
+        case 'wrong-password':
+          errorMessage = 'Wrong password provided.';
+          break;
+        default:
+          errorMessage = 'Something went wrong. Please try again.';
+          break;
       }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage)),
+      );
     } finally {
       if (mounted) {
         setState(() {
@@ -44,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'SF YourFlow',
           style: TextStyle(fontSize: 18),
         ),
@@ -60,39 +80,59 @@ class _LoginScreenState extends State<LoginScreen> {
                 Padding(
                   padding: const EdgeInsets.all(20),
                   child: ClipRRect(
-                    child: Image.network(
-                      "https://firebasestorage.googleapis.com/v0/b/myflow-umsa.appspot.com/o/logosellersflow_horizontal-v3.png?alt=media&token=1277ca5f-b871-47d5-92df-9e9571c91d90",
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: Image.asset(
+                      Theme.of(context).brightness == Brightness.dark
+                          ? 'assets/images/SellersFlowDot_logoDarkMode.png'
+                          : 'assets/images/SellersFlowDot_logo.png',
                       height: 75,
                       fit: BoxFit.cover,
                     ),
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: TextField(
                     controller: _emailController,
-                    decoration: InputDecoration(labelText: 'Email'),
+                    decoration: const InputDecoration(
+                      labelText: 'Email',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12)),
+                      ),
+                    ),
                     keyboardType: TextInputType.emailAddress,
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: TextField(
                     controller: _passwordController,
-                    decoration: InputDecoration(labelText: 'Password'),
+                    decoration: const InputDecoration(
+                      labelText: 'Password',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12)),
+                      ),
+                    ),
                     obscureText: true,
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 _isLoading
-                    ? CircularProgressIndicator()
+                    ? LoadingAnimationWidget.waveDots(
+                        color: Theme.of(context).primaryColor,
+                        size: 50,
+                      )
                     : ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        )),
+                          padding: const EdgeInsets.all(12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
                         onPressed: _login,
-                        child: Text('Login'),
+                        child: const Text('Login'),
                       ),
               ],
             ),
