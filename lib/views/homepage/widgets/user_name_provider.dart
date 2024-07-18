@@ -15,13 +15,13 @@ class WelcomeUser extends StatelessWidget {
         HapticFeedback.lightImpact();
         appState.regenerateGreeting();
       },
-      child: Text(
-        appState.greetingText,
+      child: appState.userName != '' ? Text(
+        "${appState.greetingText},\n${appState.userName}!",
         style: const TextStyle(
           fontSize: 38,
           fontWeight: FontWeight.bold,
         ),
-      ),
+      ) : const CircularProgressIndicator.adaptive(),
     );
   }
 }

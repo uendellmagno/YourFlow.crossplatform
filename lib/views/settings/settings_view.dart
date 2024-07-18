@@ -98,7 +98,7 @@ class SettingsListBuilder extends StatelessWidget {
               onPressed: () {
                 FirebaseAuth.instance.signOut();
                 Navigator.of(context).pop();
-                appState.setCurrentIndex(0);
+                appState.loggedOut();
               },
               child: const Text('Yes'),
             ),

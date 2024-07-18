@@ -30,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
         password: _passwordController.text.trim(),
       );
       final appState = Provider.of<MyAppState>(context, listen: false);
-      await appState.fetchUserName();
+      await appState.getUserGreetings();
       await appState.regenerateGreeting();
     } on FirebaseAuthException catch (e) {
       String errorMessage;
@@ -142,10 +142,10 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   _emailController.dispose();
+  //   _passwordController.dispose();
+  //   super.dispose();
+  // }
 }

@@ -110,7 +110,7 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Future<void> _refresh() async {
-    await Provider.of<MyAppState>(context, listen: false).fetchUserNameOnly();
+    await Provider.of<MyAppState>(context, listen: false).fetchUserName();
     setState(() {
       _future = apiOps.graphsRevenue();
     });
@@ -211,11 +211,11 @@ class YFHomeView extends StatelessWidget {
                       return const Center(
                           child: CircularProgressIndicator.adaptive());
                     } else if (snapshot.hasError) {
-                      return cardsViewError();
+                      return cardsViewError(context);
                     } else if (snapshot.hasData) {
                       return cardsView(apiOps);
                     } else {
-                      return cardsViewError();
+                      return cardsViewError(context);
                     }
                   },
                 )
@@ -227,18 +227,25 @@ class YFHomeView extends StatelessWidget {
     );
   }
 
-  Center cardsViewError() {
+  Center cardsViewError(context) {
     return Center(
         child: Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(20),
       child: Column(
         children: [
           const Text(
               "It's us, not you. Try again pressing the button below.\nIf the problem persists, contact support."),
+          const SizedBox(height: 20),
           ElevatedButton.icon(
             onPressed: () {
               HapticFeedback.selectionClick();
               refresh;
+              apiOps.forceFreshFetch();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Please, quit and reopen the app :)'),
+                ),
+              );
             },
             icon: const Icon(Icons.refresh),
             label: const Text('Retry'),
