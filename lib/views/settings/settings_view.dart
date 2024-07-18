@@ -20,14 +20,14 @@ class SettingsView extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
+      body: const Padding(
+        padding: EdgeInsets.all(8.0),
         child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
+          physics: BouncingScrollPhysics(),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const SettingsListBuilder(),
+              SettingsListBuilder(),
             ],
           ),
         ),
@@ -53,10 +53,10 @@ class SettingsListBuilder extends StatelessWidget {
               view: const Text('Profile'),
               tileType: 'profile',
             ),
-            SettingsCard(
+            const SettingsCard(
               title: 'Help',
               subtitle: "Get help with the app",
-              view: const Text('Help'),
+              view: Text('Help'),
               tileType: 'help',
             ),
             SettingsCard(
@@ -67,7 +67,7 @@ class SettingsListBuilder extends StatelessWidget {
               tapGesture: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => AboutView()),
+                  MaterialPageRoute(builder: (context) => const AboutView()),
                 );
               },
             ),

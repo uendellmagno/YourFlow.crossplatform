@@ -2,7 +2,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:your_flow/services/api_ops.dart';
 
-
 // This is the app state class
 class MyAppState extends ChangeNotifier {
   int _currentIndex = 0;
@@ -13,7 +12,7 @@ class MyAppState extends ChangeNotifier {
   String get userName => _userName;
   String get greetingText => _greetingText;
 
- // This is the constructor for the app state class, it fetches the user name and updates the greeting text.
+  // This is the constructor for the app state class, it fetches the user name and updates the greeting text.
   MyAppState() {
     fetchUserName();
     updateGreeting();
@@ -34,7 +33,7 @@ class MyAppState extends ChangeNotifier {
       updateGreeting();
       notifyListeners();
     } catch (error) {
-      print('Error fetching user info: $error');
+      DoNothingAction();
     }
   }
 

@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
         theme: lightThemeMethod(lightColorScheme),
         darkTheme: darkThemeMethod(darkColorScheme),
         themeMode: ThemeMode.system,
-        home: AuthChecker(
+        home: const AuthChecker(
           child: MainScreen(),
         ),
       ),

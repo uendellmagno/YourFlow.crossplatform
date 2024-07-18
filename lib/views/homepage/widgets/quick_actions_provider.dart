@@ -16,12 +16,12 @@ class QuickActionsProvider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
+    return const SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Padding(
         padding: const EdgeInsets.only(top: 22, bottom: 22, left: 8, right: 8),
         child: Row(
-          children: const [
+          children: [
             QuickActionItem(
               icon: Icons.bar_chart_rounded,
               title: 'Revenue',

@@ -31,14 +31,13 @@ class UserNameView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return const SizedBox(
       width: double.infinity,
       child: Padding(
-        padding:
-            const EdgeInsets.only(right: 30, top: 30, bottom: 30, left: 20),
+        padding: EdgeInsets.only(right: 30, top: 30, bottom: 30, left: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [WelcomeUser()],
+          children: [WelcomeUser()],
         ),
       ),
     );
