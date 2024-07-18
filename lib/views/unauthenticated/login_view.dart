@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:your_flow/services/app_state_core.dart';
+import 'package:your_flow/services/api_ops.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -20,6 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _login() async {
     setState(() {
       _isLoading = true;
+      ApiOps().forceFreshFetch();
     });
 
     try {
@@ -124,10 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       )
                     : ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 35,
-                            vertical: 20,
-                          ),
+                          padding: const EdgeInsets.all(12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),

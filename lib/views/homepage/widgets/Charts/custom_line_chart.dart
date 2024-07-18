@@ -25,7 +25,6 @@ class _BoxedLineChartState extends State<BoxedLineChart> {
   void initState() {
     super.initState();
     data = widget.fetchData();
-    print(data);
   }
 
   @override
@@ -51,7 +50,7 @@ class _BoxedLineChartState extends State<BoxedLineChart> {
                   ),
                 ),
                 const Text(
-                  'per week',
+                  'per day',
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey,
@@ -62,7 +61,7 @@ class _BoxedLineChartState extends State<BoxedLineChart> {
                   future: data,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center();
+                      return const Center();
                     } else if (snapshot.hasError) {
                       return const Text(
                         'Error',

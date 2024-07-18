@@ -51,6 +51,12 @@ class ApiOps {
     }
   }
 
+  // delete cache and force refresh data from the server:
+  void forceFreshFetch() async {
+    final pref = await SharedPreferences.getInstance();
+    pref.clear();
+  }
+
   Future<Map<String, dynamic>> fetchDataWithCaching(
       String cacheKey, Future<Map<String, dynamic>> Function() fetchFunction,
       {Duration cacheTimeout = const Duration(minutes: 7)}) async {

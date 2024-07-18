@@ -19,7 +19,7 @@ class QuickActionsProvider extends StatelessWidget {
     return const SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Padding(
-        padding: const EdgeInsets.only(top: 22, bottom: 22, left: 8, right: 8),
+        padding: EdgeInsets.only(top: 22, bottom: 22, left: 8, right: 8),
         child: Row(
           children: [
             QuickActionItem(

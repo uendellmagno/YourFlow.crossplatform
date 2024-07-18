@@ -37,6 +37,7 @@ class _MainScreenState extends State<MainScreen> {
 
     return Scaffold(
       body: PageView(
+        physics: const NeverScrollableScrollPhysics(),
         controller: _pageController,
         onPageChanged: (index) {
           appState.setCurrentIndex(index);
@@ -46,7 +47,7 @@ class _MainScreenState extends State<MainScreen> {
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: 15,
-          vertical: 20,
+          vertical: 10,
         ),
         child: GNav(
           haptic: true, // haptic feedback
@@ -109,6 +110,7 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Future<void> _refresh() async {
+    await Provider.of<MyAppState>(context, listen: false).fetchUserNameOnly();
     setState(() {
       _future = apiOps.graphsRevenue();
     });
@@ -156,9 +158,7 @@ class _HomeViewState extends State<HomeView> {
               delegate: SliverChildListDelegate(
                 [
                   YFHomeView(
-                    apiOps: apiOps,
-                    future: _future,
-                  ),
+                      apiOps: apiOps, future: _future, refresh: _refresh),
                 ],
               ),
             ),
@@ -173,8 +173,13 @@ class _HomeViewState extends State<HomeView> {
 class YFHomeView extends StatelessWidget {
   final ApiOps apiOps;
   final Future<Map<String, dynamic>> future;
+  final Future<void> Function() refresh;
 
-  const YFHomeView({super.key, required this.apiOps, required this.future});
+  const YFHomeView(
+      {super.key,
+      required this.apiOps,
+      required this.future,
+      required this.refresh});
 
   @override
   Widget build(BuildContext context) {
@@ -185,6 +190,7 @@ class YFHomeView extends StatelessWidget {
           const UserNameView(),
           const QuickActionsView(),
           const Divider(
+            color: Color(0xFFEFEFEF),
             height: 1,
             thickness: 1,
           ),
@@ -202,13 +208,14 @@ class YFHomeView extends StatelessWidget {
                   future: future,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
+                      return const Center(
+                          child: CircularProgressIndicator.adaptive());
                     } else if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
+                      return cardsViewError();
                     } else if (snapshot.hasData) {
                       return cardsView(apiOps);
                     } else {
-                      return const Center(child: Text('No data'));
+                      return cardsViewError();
                     }
                   },
                 )
@@ -218,6 +225,27 @@ class YFHomeView extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Center cardsViewError() {
+    return Center(
+        child: Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        children: [
+          const Text(
+              "It's us, not you. Try again pressing the button below.\nIf the problem persists, contact support."),
+          ElevatedButton.icon(
+            onPressed: () {
+              HapticFeedback.selectionClick();
+              refresh;
+            },
+            icon: const Icon(Icons.refresh),
+            label: const Text('Retry'),
+          ),
+        ],
+      ),
+    ));
   }
 }
 

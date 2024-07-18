@@ -174,7 +174,7 @@ class SettingsCard extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0, top: 8.0),
-      child: ElevatedButton(
+      child: ElevatedButton.icon(
         style: ElevatedButton.styleFrom(
             shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
@@ -191,11 +191,11 @@ class SettingsCard extends StatelessWidget {
             );
           }
         },
-        child: ListTile(
+        icon: leadingWidget,
+        label: ListTile(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
           ),
-          leading: leadingWidget,
           title: Text(
             title,
             style: const TextStyle(

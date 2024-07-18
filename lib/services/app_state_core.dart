@@ -15,7 +15,6 @@ class MyAppState extends ChangeNotifier {
   // This is the constructor for the app state class, it fetches the user name and updates the greeting text.
   MyAppState() {
     fetchUserName();
-    updateGreeting();
   }
 
   // This method sets the current Navigation Bar index
@@ -31,6 +30,17 @@ class MyAppState extends ChangeNotifier {
       final userInfo = await api.userInfo();
       _userName = userInfo['name'];
       updateGreeting();
+      notifyListeners();
+    } catch (error) {
+      DoNothingAction();
+    }
+  }
+
+  Future fetchUserNameOnly() async {
+    try {
+      final api = ApiOps();
+      final userInfo = await api.userInfo();
+      _userName = userInfo['name'];
       notifyListeners();
     } catch (error) {
       DoNothingAction();
