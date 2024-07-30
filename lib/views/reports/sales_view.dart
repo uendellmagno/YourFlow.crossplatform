@@ -10,7 +10,7 @@ class SalesView extends StatelessWidget {
         title: const Text(
           'Sales',
           style: TextStyle(
-            fontSize: 18,
+            fontSize: 15,
           ),
         ),
         centerTitle: true,
@@ -21,7 +21,7 @@ class SalesView extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text("Sales View"),
+              Text("Coming soon..."),
             ],
           ),
         ),

@@ -80,9 +80,19 @@ class QuickActionItem extends StatelessWidget {
         onPressed: () {
           HapticFeedback.selectionClick();
           if (view != context.widget) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => view),
+            // TODO - Chega ne?
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(builder: (context) => view),
+            // );
+            showModalBottomSheet(
+              shape: BeveledRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(20)),
+              ),
+              context: context,
+              builder: (context) {
+                return view;
+              },
             );
           }
         },

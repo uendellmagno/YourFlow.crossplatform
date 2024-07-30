@@ -13,15 +13,18 @@ class WelcomeUser extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         HapticFeedback.lightImpact();
-        appState.regenerateGreeting();
+        // appState.regenerateGreeting();
       },
-      child: appState.userName != '' ? Text(
-        "${appState.greetingText},\n${appState.userName}!",
-        style: const TextStyle(
-          fontSize: 38,
-          fontWeight: FontWeight.bold,
-        ),
-      ) : const CircularProgressIndicator.adaptive(),
+      child: appState.userName != ''
+          ? Text(
+              // "${appState.greetingText},\n${appState.userName}!",
+              "Hello,\n${appState.userName}!",
+              style: const TextStyle(
+                fontSize: 35,
+                fontWeight: FontWeight.bold,
+              ),
+            )
+          : const CircularProgressIndicator.adaptive(),
     );
   }
 }
@@ -34,7 +37,7 @@ class UserNameView extends StatelessWidget {
     return const SizedBox(
       width: double.infinity,
       child: Padding(
-        padding: EdgeInsets.only(right: 30, top: 30, bottom: 30, left: 20),
+        padding: EdgeInsets.only(right: 30, top: 25, bottom: 20, left: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [WelcomeUser()],

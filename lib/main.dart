@@ -57,6 +57,7 @@ class MyApp extends StatelessWidget {
       fontFamily: 'Gilroy',
       colorScheme: lightColorScheme,
       primaryColor: lightColorScheme.primary,
+      cardColor: Color(0xFFD9D9D9),
       scaffoldBackgroundColor: lightColorScheme.surface,
       appBarTheme: AppBarTheme(
         backgroundColor: lightColorScheme.surface,
@@ -74,6 +75,7 @@ class MyApp extends StatelessWidget {
       useMaterial3: true,
       colorScheme: darkColorScheme,
       primaryColor: darkColorScheme.primary,
+      cardColor: Color(0xFF262626),
       scaffoldBackgroundColor: darkColorScheme.surface,
       appBarTheme: AppBarTheme(
         backgroundColor: darkColorScheme.surface,

@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -6,6 +8,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ApiOps {
   // This is a local server, you can change it to your own server
   static String path = "http://192.168.3.209:8000";
+
+  static const int maxRetries = 3; // Number of retry attempts
+  static const Duration retryDelay =
+      Duration(seconds: 5); // Delay between retries
 
   Map<String, String> filter = {};
 
@@ -33,22 +39,48 @@ class ApiOps {
     return urlResponse;
   }
 
-  // This method mounts the request
+  // This method mounts the request with retry logic
   Future<Map<String, dynamic>> mountRequest(String endpoint) async {
     final token = await getUserToken();
     endpoint = '$endpoint/?${getUrlFilter()}';
-    final response = await http.get(
-      Uri.parse(endpoint),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-    );
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Failed to load data');
+
+    int attempt = 0;
+
+    while (attempt < maxRetries) {
+      attempt++;
+      try {
+        final response = await http.get(
+          Uri.parse(endpoint),
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+        ).timeout(Duration(seconds: 30)); // Adjust timeout duration here
+
+        if (response.statusCode == 200) {
+          return json.decode(response.body);
+        } else {
+          throw Exception('Failed to load data: ${response.statusCode}');
+        }
+      } on TimeoutException catch (e) {
+        if (attempt >= maxRetries) {
+          throw Exception('Request timed out after $maxRetries attempts: $e');
+        }
+      } on SocketException catch (e) {
+        if (attempt >= maxRetries) {
+          throw Exception('Socket exception after $maxRetries attempts: $e');
+        }
+      } catch (e) {
+        if (attempt >= maxRetries) {
+          throw Exception('An error occurred after $maxRetries attempts: $e');
+        }
+      }
+
+      // Wait before retrying
+      await Future.delayed(retryDelay);
     }
+
+    throw Exception('Failed to load data after $maxRetries attempts');
   }
 
   // delete cache and force refresh data from the server:

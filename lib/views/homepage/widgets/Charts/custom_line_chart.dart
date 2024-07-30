@@ -158,8 +158,10 @@ class CustomLineChart extends StatelessWidget {
           child: LineChart(
             LineChartData(
               lineTouchData: const LineTouchData(
+
                 touchTooltipData: LineTouchTooltipData(
                   showOnTopOfTheChartBoxArea: true,
+
                 ),
               ),
               gridData: const FlGridData(show: false),
