@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "556751661372",
-    "project_id": "yourflow-app",
-    "storage_bucket": "yourflow-app.appspot.com"
+    "project_number": "1078170401994",
+    "project_id": "sf-dataflow",
+    "storage_bucket": "sf-dataflow.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:556751661372:android:2006e5f9d4dbf69631d639",
+        "mobilesdk_app_id": "1:1078170401994:android:2a168e2b0bcb9459e90833",
         "android_client_info": {
           "package_name": "com.avlasolutions.yourflow"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAWJc6p9-kbbRnuEiwlGGShJMQmNYpJfsA"
+          "current_key": "AIzaSyBZvJtOMRctrysqWBT46hNEDZhkP9b0MJI"
         }
       ],
       "services": {

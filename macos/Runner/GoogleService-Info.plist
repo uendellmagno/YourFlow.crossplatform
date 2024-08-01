@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>API_KEY</key>
-	<string>AIzaSyAe23m82-16XCBvjLpoiz9KCY-0gMVn8kQ</string>
+	<string>AIzaSyAxJPAT1JDsH9F9xc6zSaINyDcmyt6D8dk</string>
 	<key>GCM_SENDER_ID</key>
-	<string>556751661372</string>
+	<string>1078170401994</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.avlasolutions.yourflow</string>
 	<key>PROJECT_ID</key>
-	<string>yourflow-app</string>
+	<string>sf-dataflow</string>
 	<key>STORAGE_BUCKET</key>
-	<string>yourflow-app.appspot.com</string>
+	<string>sf-dataflow.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:556751661372:ios:e29aa9329b4d2cf431d639</string>
+	<string>1:1078170401994:ios:d605fd801879fe62e90833</string>
 </dict>
 </plist>

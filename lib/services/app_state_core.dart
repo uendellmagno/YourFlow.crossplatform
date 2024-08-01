@@ -5,7 +5,7 @@ import 'package:your_flow/services/api_ops.dart';
 // This is the app state class
 class MyAppState extends ChangeNotifier {
   int _currentIndex = 0;
-  String _userName = "User";
+  String _userName = '';
   String _greetingText = "Welcome to\nYourFlow!";
 
   int get currentIndex => _currentIndex;
@@ -14,7 +14,7 @@ class MyAppState extends ChangeNotifier {
 
   // This is the constructor for the app state class, it fetches the user name and updates the greeting text.
   MyAppState() {
-    fetchUserName();
+    getUserGreetings();
   }
 
   // This method sets the current Navigation Bar index
@@ -29,18 +29,17 @@ class MyAppState extends ChangeNotifier {
       final api = ApiOps();
       final userInfo = await api.userInfo();
       _userName = userInfo['name'];
-      updateGreeting();
       notifyListeners();
     } catch (error) {
       DoNothingAction();
     }
   }
 
-  Future fetchUserNameOnly() async {
+  // This method fetches the user name from the server
+  Future getUserGreetings() async {
     try {
-      final api = ApiOps();
-      final userInfo = await api.userInfo();
-      _userName = userInfo['name'];
+      await fetchUserName();
+      updateGreeting();
       notifyListeners();
     } catch (error) {
       DoNothingAction();
@@ -60,7 +59,14 @@ class MyAppState extends ChangeNotifier {
 
     final random = Random();
     final index = random.nextInt(greetings.length);
-    _greetingText = "${greetings[index]},\n$_userName!";
+    _greetingText = greetings[index];
+  }
+
+  Future loggedOut() async {
+    _userName = '';
+    _greetingText = "Welcome to\nYourFlow!";
+    setCurrentIndex(0);
+    notifyListeners();
   }
 
   // This method regenerates the greeting text

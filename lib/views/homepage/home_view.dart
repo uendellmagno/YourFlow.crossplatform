@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:your_flow/services/app_state_core.dart';
+import 'package:your_flow/views/homepage/widgets/products_ranking_provider.dart';
 import 'package:your_flow/views/homepage/widgets/quick_actions_provider.dart';
+import 'package:your_flow/views/homepage/widgets/quick_insights_provider.dart';
+import 'package:your_flow/views/homepage/widgets/sales_mix_provider.dart';
 import 'package:your_flow/views/homepage/widgets/user_name_provider.dart';
-import 'package:your_flow/views/homepage/widgets/Charts/custom_line_chart.dart';
 import 'package:your_flow/views/notifications/notifications_view.dart';
-import 'package:your_flow/views/reports/requests_view.dart';
+import 'package:your_flow/views/reports/products_view.dart';
 import 'package:your_flow/views/reports/sales_view.dart';
 import 'package:your_flow/views/settings/settings_view.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
@@ -31,7 +33,7 @@ class _MainScreenState extends State<MainScreen> {
     List<Widget> pages = [
       const HomeView(),
       const SalesView(),
-      const RequestsView(),
+      const ProductsView(),
       const SettingsView(),
     ];
 
@@ -75,9 +77,9 @@ class _MainScreenState extends State<MainScreen> {
               icon: Icons.attach_money_rounded,
             ),
             GButton(
-              semanticLabel: "Requests",
-              text: 'Requests',
-              icon: Icons.bubble_chart_rounded,
+              semanticLabel: "Products",
+              text: 'Products',
+              icon: Icons.warehouse_rounded,
             ),
             GButton(
               semanticLabel: "Settings",
@@ -109,8 +111,9 @@ class _HomeViewState extends State<HomeView> {
     _future = apiOps.graphsRevenue();
   }
 
+  // This is the Refresh system for the HomeView
   Future<void> _refresh() async {
-    await Provider.of<MyAppState>(context, listen: false).fetchUserNameOnly();
+    await Provider.of<MyAppState>(context, listen: false).fetchUserName();
     setState(() {
       _future = apiOps.graphsRevenue();
     });
@@ -120,7 +123,7 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     return Scaffold(
       // The app bar is a sliver app bar with a title and an action button
-      body: RefreshIndicator(
+      body: RefreshIndicator.adaptive(
         onRefresh: _refresh,
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
@@ -132,22 +135,20 @@ class _HomeViewState extends State<HomeView> {
               floating: true,
               pinned: false,
               snap: true,
-              title: const Text(
-                'YourFlow',
-                style: TextStyle(
-                  fontSize: 18,
-                ),
-              ),
+              title: Text("YourFlow", style: TextStyle(fontSize: 15)),
               centerTitle: true,
               actions: [
                 IconButton(
                   onPressed: () {
                     HapticFeedback.selectionClick();
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const NotificationsView()),
-                    );
+
+                    // TODO - Or a Navigator.push()?
+                    showModalBottomSheet(
+                        shape: const BeveledRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(20))),
+                        context: context,
+                        builder: (context) => const NotificationsView());
                   },
                   enableFeedback: true,
                   icon: const Icon(Icons.notifications),
@@ -189,146 +190,17 @@ class YFHomeView extends StatelessWidget {
         children: [
           const UserNameView(),
           const QuickActionsView(),
-          const Divider(
-            color: Color(0xFFEFEFEF),
-            height: 1,
-            thickness: 1,
-          ),
           const Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [],
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 15, bottom: 15),
-            child: Column(
-              children: [
-                cardsTopHeader(context),
-                FutureBuilder<Map<String, dynamic>>(
-                  future: future,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                          child: CircularProgressIndicator.adaptive());
-                    } else if (snapshot.hasError) {
-                      return cardsViewError();
-                    } else if (snapshot.hasData) {
-                      return cardsView(apiOps);
-                    } else {
-                      return cardsViewError();
-                    }
-                  },
-                )
-              ],
-            ),
+            children: [
+              QuickInsightsView(),
+              SalesMixView(),
+              ProductsRankingView(),
+            ],
           ),
         ],
       ),
     );
   }
-
-  Center cardsViewError() {
-    return Center(
-        child: Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        children: [
-          const Text(
-              "It's us, not you. Try again pressing the button below.\nIf the problem persists, contact support."),
-          ElevatedButton.icon(
-            onPressed: () {
-              HapticFeedback.selectionClick();
-              refresh;
-            },
-            icon: const Icon(Icons.refresh),
-            label: const Text('Retry'),
-          ),
-        ],
-      ),
-    ));
-  }
-}
-
-GridView cardsView(ApiOps apiOps) {
-  return GridView(
-    shrinkWrap: true,
-    physics: const NeverScrollableScrollPhysics(),
-    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: 2,
-      childAspectRatio: 0.8,
-      crossAxisSpacing: 7,
-      mainAxisSpacing: 7,
-    ),
-    children: [
-      BoxedLineChart(
-        defaultVar: "Total Sales",
-        fetchData: apiOps.graphsRevenue,
-      ),
-      BoxedLineChart(
-        defaultVar: "Units",
-        fetchData: apiOps.graphsRevenue,
-      ),
-      BoxedLineChart(
-        defaultVar: "Price",
-        fetchData: apiOps.graphsRevenue,
-      ),
-      BoxedLineChart(
-        defaultVar: "Ads Sales",
-        fetchData: apiOps.graphsRevenue,
-      ),
-      BoxedLineChart(
-        defaultVar: "Ads Spend",
-        fetchData: apiOps.graphsRevenue,
-      ),
-      BoxedLineChart(
-        defaultVar: "Other",
-        fetchData: apiOps.graphsRevenue,
-      ),
-    ],
-  );
-}
-
-Row cardsTopHeader(BuildContext context) {
-  return Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-      const Padding(
-        padding: EdgeInsets.only(left: 15),
-        child: Text(
-          'Overview',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.only(right: 15),
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(8),
-              ),
-            ),
-          ),
-          onPressed: () {
-            HapticFeedback.selectionClick();
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const SalesView(),
-              ),
-            );
-          },
-          child: Text(
-            'View All',
-            style: TextStyle(
-              color: Theme.of(context).primaryColor,
-            ),
-          ),
-        ),
-      ),
-    ],
-  );
 }

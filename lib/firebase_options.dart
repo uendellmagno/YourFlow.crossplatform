@@ -47,40 +47,43 @@ class DefaultFirebaseOptions {
     projectId: 'yourflow-app',
     authDomain: 'yourflow-app.firebaseapp.com',
     storageBucket: 'yourflow-app.appspot.com',
+    measurementId: 'G-2KY517PJYS',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAWJc6p9-kbbRnuEiwlGGShJMQmNYpJfsA',
-    appId: '1:556751661372:android:2006e5f9d4dbf69631d639',
-    messagingSenderId: '556751661372',
-    projectId: 'yourflow-app',
-    storageBucket: 'yourflow-app.appspot.com',
+    apiKey: 'AIzaSyBZvJtOMRctrysqWBT46hNEDZhkP9b0MJI',
+    appId: '1:1078170401994:android:2a168e2b0bcb9459e90833',
+    messagingSenderId: '1078170401994',
+    projectId: 'sf-dataflow',
+    storageBucket: 'sf-dataflow.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAe23m82-16XCBvjLpoiz9KCY-0gMVn8kQ',
-    appId: '1:556751661372:ios:e4f22bb415ed73c231d639',
-    messagingSenderId: '556751661372',
-    projectId: 'yourflow-app',
-    storageBucket: 'yourflow-app.appspot.com',
+    apiKey: 'AIzaSyAxJPAT1JDsH9F9xc6zSaINyDcmyt6D8dk',
+    appId: '1:1078170401994:ios:ebc4a8ea7748d7b6e90833',
+    messagingSenderId: '1078170401994',
+    projectId: 'sf-dataflow',
+    storageBucket: 'sf-dataflow.appspot.com',
     iosBundleId: 'com.avla.yourflow',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyAe23m82-16XCBvjLpoiz9KCY-0gMVn8kQ',
-    appId: '1:556751661372:ios:e29aa9329b4d2cf431d639',
-    messagingSenderId: '556751661372',
-    projectId: 'yourflow-app',
-    storageBucket: 'yourflow-app.appspot.com',
+    apiKey: 'AIzaSyAxJPAT1JDsH9F9xc6zSaINyDcmyt6D8dk',
+    appId: '1:1078170401994:ios:d605fd801879fe62e90833',
+    messagingSenderId: '1078170401994',
+    projectId: 'sf-dataflow',
+    storageBucket: 'sf-dataflow.appspot.com',
     iosBundleId: 'com.avlasolutions.yourflow',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyBOQWCMLbSc2ie_6DHw4jow01nSRuCUCq0',
-    appId: '1:556751661372:web:4ed16bdb0e7ccb6331d639',
-    messagingSenderId: '556751661372',
-    projectId: 'yourflow-app',
-    authDomain: 'yourflow-app.firebaseapp.com',
-    storageBucket: 'yourflow-app.appspot.com',
+    apiKey: 'AIzaSyDMC3r16fO-EV74SUDNe-0K0p-a8Od6ESc',
+    appId: '1:1078170401994:web:1af31988a9cf992fe90833',
+    messagingSenderId: '1078170401994',
+    projectId: 'sf-dataflow',
+    authDomain: 'sf-dataflow.firebaseapp.com',
+    storageBucket: 'sf-dataflow.appspot.com',
+    measurementId: 'G-E41480NFFP',
   );
+
 }
