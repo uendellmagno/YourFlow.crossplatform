@@ -5,6 +5,7 @@ import 'package:your_flow/services/app_state_core.dart';
 import 'package:your_flow/views/homepage/widgets/products_ranking_provider.dart';
 import 'package:your_flow/views/homepage/widgets/quick_actions_provider.dart';
 import 'package:your_flow/views/homepage/widgets/quick_insights_provider.dart';
+import 'package:your_flow/views/homepage/widgets/sales_mix_provider.dart';
 import 'package:your_flow/views/homepage/widgets/user_name_provider.dart';
 import 'package:your_flow/views/notifications/notifications_view.dart';
 import 'package:your_flow/views/reports/products_view.dart';
@@ -122,7 +123,7 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     return Scaffold(
       // The app bar is a sliver app bar with a title and an action button
-      body: RefreshIndicator(
+      body: RefreshIndicator.adaptive(
         onRefresh: _refresh,
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
@@ -194,6 +195,7 @@ class YFHomeView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               QuickInsightsView(),
+              SalesMixView(),
               ProductsRankingView(),
             ],
           ),

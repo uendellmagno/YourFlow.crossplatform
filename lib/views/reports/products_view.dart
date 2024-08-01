@@ -176,7 +176,6 @@ class _IDayChartState extends State<IDayChartProvider> {
                     } else if (snapshot.hasError) {
                       return const Center(child: Text('Error loading data'));
                     } else {
-                      print(snapshot.data!['Inventory']['Inventory by day']);
                       // Convert date strings to day of the year for x-axis
                       List<FlSpot> spots = (snapshot.data!['Inventory']
                               ['Inventory by day'] as Map<String, dynamic>)
@@ -191,7 +190,6 @@ class _IDayChartState extends State<IDayChartProvider> {
                             .toDouble();
                         return FlSpot(dayOfYear, entry.value.toDouble());
                       }).toList();
-                      print(spots);
 
                       return IDayChart(data: spots);
                     }

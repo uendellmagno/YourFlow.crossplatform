@@ -1,8 +1,11 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:your_flow/services/firebase_tools.dart';
+import 'package:your_flow/services/connectivity_services.dart';
+import 'package:your_flow/views/errors/internet_error.dart';
 import 'package:your_flow/views/homepage/home_view.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:your_flow/services/app_state_core.dart';
@@ -36,17 +39,35 @@ class MyApp extends StatelessWidget {
       brightness: Brightness.dark,
     );
 
-    return ChangeNotifierProvider(
-      create: (context) => MyAppState(),
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: "YourFlow",
-        theme: lightThemeMethod(lightColorScheme),
-        darkTheme: darkThemeMethod(darkColorScheme),
-        themeMode: ThemeMode.system,
-        home: const AuthChecker(
-          child: MainScreen(),
-        ),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => MyAppState()),
+        Provider(create: (context) => ConnectivityService()),
+      ],
+      child: Consumer<ConnectivityService>(
+        builder: (context, connectivityService, child) {
+          return StreamBuilder<ConnectivityResult>(
+            stream: connectivityService.connectivityStream,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.active) {
+                final connectivityResult = snapshot.data;
+                if (connectivityResult == ConnectivityResult.none) {
+                  return const NoInternetConnection();
+                } else {
+                  return MaterialApp(
+                    debugShowCheckedModeBanner: false,
+                    title: "YourFlow",
+                    theme: lightThemeMethod(lightColorScheme),
+                    darkTheme: darkThemeMethod(darkColorScheme),
+                    themeMode: ThemeMode.system,
+                    home: const AuthChecker(child: MainScreen()),
+                  );
+                }
+              }
+              return const Center(child: CircularProgressIndicator());
+            },
+          );
+        },
       ),
     );
   }
@@ -57,7 +78,7 @@ class MyApp extends StatelessWidget {
       fontFamily: 'Gilroy',
       colorScheme: lightColorScheme,
       primaryColor: lightColorScheme.primary,
-      cardColor: Color(0xFFD9D9D9),
+      cardColor: const Color(0xFFD9D9D9),
       scaffoldBackgroundColor: lightColorScheme.surface,
       appBarTheme: AppBarTheme(
         backgroundColor: lightColorScheme.surface,
@@ -75,7 +96,7 @@ class MyApp extends StatelessWidget {
       useMaterial3: true,
       colorScheme: darkColorScheme,
       primaryColor: darkColorScheme.primary,
-      cardColor: Color(0xFF262626),
+      cardColor: const Color(0xFF262626),
       scaffoldBackgroundColor: darkColorScheme.surface,
       appBarTheme: AppBarTheme(
         backgroundColor: darkColorScheme.surface,
