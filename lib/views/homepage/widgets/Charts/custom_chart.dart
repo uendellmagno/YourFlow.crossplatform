@@ -1,20 +1,65 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:your_flow/services/api_ops.dart';
 
 class CChartState extends StatefulWidget {
-  const CChartState({super.key});
+  final ApiOps apiOps;
+  const CChartState({super.key, required this.apiOps});
 
   @override
   State<CChartState> createState() => CustomChart();
 }
 
 class CustomChart extends State<CChartState> {
-  String? _dropdownValue = 'Item1'; // Initialize with a default value
+  String? _dropdownValue = 'Loading...'; // Initialize with a default value
 
-  // final List<bool> _toggleButton = [false, true];
   bool _isDailySelected = false;
-
   int touchedIndex = -1;
+
+  late Future<Map<String, dynamic>> data;
+  List<DropdownMenuItem<String>> dropdownItems = [];
+
+  @override
+  void initState() {
+    super.initState();
+    data = widget.apiOps.graphsHome();
+    data.then((dataMap) {
+      // Initialize an empty list for dropdown items
+      List<DropdownMenuItem<String>> dropdownItems = [];
+
+      // Function to add DropdownMenuItems for given keys
+      void addDropdownItems(Map<String, dynamic> section) {
+        dropdownItems.addAll(
+          section.keys.map((key) {
+            return DropdownMenuItem<String>(
+              value: key,
+              child: Text(key),
+            );
+          }).toList(),
+        );
+      }
+
+      // Check for and add keys from 'Revenue' and 'Marketing'
+      if (dataMap.containsKey('Revenue')) {
+        addDropdownItems(dataMap['Revenue']);
+      }
+
+      if (dataMap.containsKey('Marketing')) {
+        addDropdownItems(dataMap['Marketing']);
+      }
+
+      setState(() {
+        // Set the dropdown items and default selected value
+        _dropdownValue =
+            dropdownItems.isNotEmpty ? dropdownItems[0].value : null;
+        this.dropdownItems = dropdownItems;
+      });
+    }).catchError((error) {
+      // Handle any errors from fetching data
+      print('Error fetching data: $error');
+    });
+  }
 
   void dropdownCallback(String? selectedValue) {
     setState(() {
@@ -24,6 +69,8 @@ class CustomChart extends State<CChartState> {
 
   @override
   Widget build(BuildContext context) {
+    // print(data.toString);
+    // print(_dropdownValue);
     return Column(
       children: [
         Padding(
@@ -69,99 +116,7 @@ class CustomChart extends State<CChartState> {
                     flex: 5,
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: BarChart(
-                        BarChartData(
-                          barTouchData: BarTouchData(
-                              touchTooltipData: BarTouchTooltipData(
-                                fitInsideHorizontally: true,
-                                tooltipHorizontalAlignment:
-                                    FLHorizontalAlignment.right,
-                                tooltipMargin: -10,
-                                getTooltipItem:
-                                    (group, groupIndex, rod, rodIndex) {
-                                  String weekDay;
-                                  switch (group.x) {
-                                    case 0:
-                                      weekDay = 'Monday';
-                                      break;
-                                    case 1:
-                                      weekDay = 'Tuesday';
-                                      break;
-                                    case 2:
-                                      weekDay = 'Wednesday';
-                                      break;
-                                    case 3:
-                                      weekDay = 'Thursday';
-                                      break;
-                                    case 4:
-                                      weekDay = 'Friday';
-                                      break;
-                                    case 5:
-                                      weekDay = 'Saturday';
-                                      break;
-                                    case 6:
-                                      weekDay = 'Sunday';
-                                      break;
-                                    default:
-                                      weekDay = '';
-                                  }
-                                  return BarTooltipItem(
-                                    '$weekDay\n',
-                                    const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 15,
-                                    ),
-                                    children: <TextSpan>[
-                                      TextSpan(
-                                        text: (rod.toY - 1).toString(),
-                                        style: const TextStyle(
-                                          color: Colors
-                                              .white, //widget.touchedBarColor,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              ),
-                              touchCallback:
-                                  (FlTouchEvent event, barTouchResponse) {
-                                setState(() {
-                                  if (!event.isInterestedForInteractions ||
-                                      barTouchResponse == null ||
-                                      barTouchResponse.spot == null) {
-                                    touchedIndex = -1;
-                                    return;
-                                  }
-                                  touchedIndex = barTouchResponse
-                                      .spot!.touchedBarGroupIndex;
-                                });
-                              }),
-                          gridData: FlGridData(
-                            show: false,
-                          ),
-                          titlesData: FlTitlesData(
-                            show: true,
-                            leftTitles: AxisTitles(
-                              sideTitles: SideTitles(showTitles: false),
-                            ),
-                            rightTitles: AxisTitles(
-                              sideTitles: SideTitles(showTitles: false),
-                            ),
-                            topTitles: AxisTitles(
-                              sideTitles: SideTitles(showTitles: false),
-                            ),
-                          ),
-                          borderData: FlBorderData(
-                            show: false,
-                          ),
-                          barGroups: showingGroups(
-                            List.generate(20, (index) => index.toDouble()),
-                          ),
-                        ),
-                      ),
+                      child: barChart(),
                     ),
                   ),
                 ],
@@ -169,32 +124,14 @@ class CustomChart extends State<CChartState> {
             ),
           ),
         ),
-        // TODO - Rebuild this
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 12),
           child: SizedBox(
             width: double.infinity,
             height: 60,
-            child: DropdownButton(
-              icon: Icon(Icons.arrow_drop_down_circle_rounded),
-              value: _dropdownValue,
-              underline: Container(),
-              // TODO - Render this dynamically through the API
-              items: [
-                DropdownMenuItem(value: 'Item1', child: Text("Item 1")),
-                DropdownMenuItem(value: 'Item2', child: Text("Item 2")),
-                DropdownMenuItem(value: 'Item3', child: Text("Item 3")),
-                DropdownMenuItem(value: 'Item4', child: Text("Item 4")),
-                DropdownMenuItem(value: 'Item5', child: Text("Item 5")),
-                DropdownMenuItem(value: 'Item6', child: Text("Item 6")),
-                DropdownMenuItem(value: 'Item7', child: Text("Item 7")),
-              ],
-              onChanged: dropdownCallback,
-              isExpanded: true,
-            ),
+            child: dropdownButton(),
           ),
         ),
-
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 18, vertical: 7),
           child: Row(
@@ -257,6 +194,77 @@ class CustomChart extends State<CChartState> {
     );
   }
 
+  DropdownButton<String> dropdownButton() {
+    return DropdownButton(
+      icon: Icon(Icons.arrow_drop_down_circle_rounded),
+      value: _dropdownValue,
+      underline: Container(),
+      items: dropdownItems,
+      onChanged: dropdownCallback,
+      isExpanded: true,
+    );
+  }
+
+  Widget barChart() {
+    return FutureBuilder<Map<String, dynamic>>(
+      future: data,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: LoadingAnimationWidget.waveDots(
+                color: Theme.of(context).primaryColor, size: 40),
+          );
+        } else if (snapshot.hasError) {
+          return const Center(child: Text('Error loading data'));
+        } else if (!snapshot.hasData) {
+          return const Center(child: Text('No data available'));
+        } else {
+          return BarChart(
+            BarChartData(
+              barTouchData: BarTouchData(
+                  touchTooltipData: BarTouchTooltipData(
+                    fitInsideHorizontally: true,
+                    tooltipHorizontalAlignment: FLHorizontalAlignment.right,
+                    tooltipMargin: -10,
+                  ),
+                  touchCallback: (FlTouchEvent event, barTouchResponse) {
+                    setState(() {
+                      if (!event.isInterestedForInteractions ||
+                          barTouchResponse == null ||
+                          barTouchResponse.spot == null) {
+                        touchedIndex = -1;
+                        return;
+                      }
+                      touchedIndex =
+                          barTouchResponse.spot!.touchedBarGroupIndex;
+                    });
+                  }),
+              gridData: FlGridData(
+                show: false,
+              ),
+              titlesData: FlTitlesData(
+                show: true,
+                leftTitles: AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
+                rightTitles: AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
+                topTitles: AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
+              ),
+              borderData: FlBorderData(
+                show: false,
+              ),
+              barGroups: showingGroups(snapshot.data!),
+            ),
+          );
+        }
+      },
+    );
+  }
+
   BarChartGroupData barGroupData(
     int x,
     double y, {
@@ -274,12 +282,23 @@ class CustomChart extends State<CChartState> {
     ]);
   }
 
-  List<BarChartGroupData> showingGroups(List<double> amounts) {
-    int amount = 7;
-    return List.generate(amount, (i) {
-      // TODO - temp logix
-      return barGroupData(i + 1, i.toDouble(),
-          width: amount > 7 ? 5 : 30, isTouched: i == touchedIndex);
-    });
+  List<BarChartGroupData> showingGroups(Map<String, dynamic> data) {
+    return data.keys.map((entry) {
+      print('HEY THE KEY IS RIGHT HERE: $entry, Value: ${data[entry]}');
+      return barGroupData(entry.hashCode, 2);
+    }).toList();
   }
 }
+
+// List<BarChartGroupData> showingGroups(Map<String, dynamic> data) {
+//   List<BarChartGroupData> barChartGroupData = [];
+//   int index = 0;
+  
+//   data.forEach((key, value) {
+//     print('Key: $key, Value: $value');
+//     barChartGroupData.add(barGroupData(index, value));
+//     index++;
+//   });
+
+//   return barChartGroupData;
+// }

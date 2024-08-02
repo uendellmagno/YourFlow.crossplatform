@@ -1,32 +1,55 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiOps {
-  static String path = "https://sellerflow.com.br:8443";
+  static const String path = "https://sellerflow.com.br:8443";
   static const int maxRetries = 5;
   static const Duration retryDelay = Duration(seconds: 5);
+  static const Duration requestTimeout = Duration(seconds: 30);
+
+  final Dio _dio = Dio(
+    BaseOptions(
+      baseUrl: path,
+      connectTimeout: requestTimeout,
+      receiveTimeout: requestTimeout,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    ),
+  );
 
   Map<String, String> filter = {};
 
+  ApiOps() {
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          print('Request: ${options.method} ${options.path}');
+          return handler.next(options);
+        },
+        onResponse: (response, handler) {
+          print('Response: ${response.statusCode} ${response.data}');
+          return handler.next(response);
+        },
+        onError: (DioException e, handler) {
+          print('Error: ${e.message}');
+          return handler.next(e);
+        },
+      ),
+    );
+  }
+
   Future<bool> connected() async {
     int attempt = 0;
-    final endpoint = '$path/docs';
+    const endpoint = '$path/docs';
 
     while (attempt < maxRetries) {
       attempt++;
       try {
-        final response = await http.get(
-          Uri.parse(endpoint),
-          headers: {
-            'Authorization': 'Bearer ',
-            'Content-Type': 'application/json',
-          },
-        );
-
+        final response = await _dio.get(endpoint);
         if (response.statusCode == 200) {
           print('connected, $response');
           return true;
@@ -43,26 +66,20 @@ class ApiOps {
     return false;
   }
 
-  Future<String> getUserToken() async {
+  Future<String?> getUserToken() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       final token = await user.getIdToken();
-      if (token != null) {
-        return token;
-      } else {
-        throw Exception("Failed to retrieve token");
-      }
+      return token;
     } else {
       throw Exception("User not found");
     }
   }
 
   String getUrlFilter() {
-    var urlResponse = '';
-    filter.forEach((key, value) {
-      urlResponse += '&$key=${value.replaceAll('&', '%26')}';
-    });
-    return urlResponse;
+    return filter.entries
+        .map((e) => '&${e.key}=${e.value.replaceAll('&', '%26')}')
+        .join();
   }
 
   Future<Map<String, dynamic>> mountRequest(String endpoint) async {
@@ -74,30 +91,22 @@ class ApiOps {
     while (attempt < maxRetries) {
       attempt++;
       try {
-        final response = await http.get(
-          Uri.parse(endpoint),
-          headers: {
+        final response = await _dio.get(
+          endpoint,
+          options: Options(headers: {
             'Authorization': 'Bearer $token',
-            'Content-Type': 'application/json',
-          },
-        ).timeout(Duration(seconds: 30)); // Adjust timeout duration here
+          }),
+        );
 
         if (response.statusCode == 200) {
-          return json.decode(response.body);
+          return response.data as Map<String, dynamic>;
         } else {
           throw Exception('Failed to load data: ${response.statusCode}');
         }
-      } on TimeoutException catch (e) {
+      } on DioException catch (e) {
         if (attempt >= maxRetries) {
-          throw Exception('Request timed out after $maxRetries attempts: $e');
-        }
-      } on SocketException catch (e) {
-        if (attempt >= maxRetries) {
-          throw Exception('Socket exception after $maxRetries attempts: $e');
-        }
-      } catch (e) {
-        if (attempt >= maxRetries) {
-          throw Exception('An error occurred after $maxRetries attempts: $e');
+          throw Exception(
+              'Request failed after $maxRetries attempts: ${e.message}');
         }
       }
       await Future.delayed(retryDelay);
@@ -105,14 +114,16 @@ class ApiOps {
     throw Exception('Failed to load data after $maxRetries attempts');
   }
 
-  void forceFreshFetch() async {
+  Future<void> forceFreshFetch() async {
     final pref = await SharedPreferences.getInstance();
-    pref.clear();
+    await pref.clear();
   }
 
   Future<Map<String, dynamic>> fetchDataWithCaching(
-      String cacheKey, Future<Map<String, dynamic>> Function() fetchFunction,
-      {Duration cacheTimeout = const Duration(minutes: 7)}) async {
+    String cacheKey,
+    Future<Map<String, dynamic>> Function() fetchFunction, {
+    Duration cacheTimeout = const Duration(minutes: 7),
+  }) async {
     final pref = await SharedPreferences.getInstance();
     final cachedData = pref.getString(cacheKey);
     final cacheTimestamp = pref.getInt('${cacheKey}_timestamp') ?? 0;
@@ -130,7 +141,7 @@ class ApiOps {
   }
 
   Future<Map<String, dynamic>> userInfo() async {
-    final endpoint = '$path/user-info';
+    const endpoint = '/user-info';
     return fetchDataWithCaching('user_info', () => mountRequest(endpoint));
   }
 
@@ -139,104 +150,103 @@ class ApiOps {
     final query = variation['queryKey'][1] != null
         ? '?variation=${variation['queryKey'][1]}'
         : '';
-    final endpoint = '$path/user-info/filter/$query';
+    final endpoint = '/user-info/filter/$query';
     final token = await getUserToken();
-    final response = await http.get(
-      Uri.parse(endpoint),
-      headers: {
+    final response = await _dio.get(
+      endpoint,
+      options: Options(headers: {
         'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
+      }),
     );
-    return json.decode(response.body);
+    return response.data as Map<String, dynamic>;
   }
 
   Future<Map<String, dynamic>> mktshareHome() async {
-    final endpoint = '$path/home/mktshare';
+    const endpoint = '/home/mktshare';
     return fetchDataWithCaching('mktshare_home', () => mountRequest(endpoint));
   }
 
   Future<Map<String, dynamic>> reviewsHome() async {
-    final endpoint = '$path/home/reviews';
+    const endpoint = '/home/reviews';
     return fetchDataWithCaching('reviews_home', () => mountRequest(endpoint));
   }
 
   Future<Map<String, dynamic>> accHealthHome() async {
-    final endpoint = '$path/home/acc-health';
+    const endpoint = '/home/acc-health';
     return fetchDataWithCaching('acc_health', () => mountRequest(endpoint));
   }
 
   Future<Map<String, dynamic>> cardsHome() async {
-    final endpoint = '$path/home/cards';
+    const endpoint = '/home/cards';
     return fetchDataWithCaching('cards_home', () => mountRequest(endpoint));
   }
 
   Future<Map<String, dynamic>> cardsAdvertising() async {
-    final endpoint = '$path/advertising/cards';
+    const endpoint = '/advertising/cards';
     return fetchDataWithCaching('cards_ads', () => mountRequest(endpoint));
   }
 
   Future<Map<String, dynamic>> cardsInventory() async {
-    final endpoint = '$path/inventory/cards';
+    const endpoint = '/inventory/cards';
     return fetchDataWithCaching(
         'cards_inventory', () => mountRequest(endpoint));
   }
 
   Future<Map<String, dynamic>> cardsRevenue() async {
-    final endpoint = '$path/revenue/cards';
+    const endpoint = '/revenue/cards';
     return fetchDataWithCaching('cards_revenue', () => mountRequest(endpoint));
   }
 
   Future<Map<String, dynamic>> graphsHome() async {
-    final endpoint = '$path/home/graphs';
+    const endpoint = '/home/graphs';
     return fetchDataWithCaching('graphs_home', () => mountRequest(endpoint));
   }
 
   Future<Map<String, dynamic>> graphsRevenue() async {
-    final endpoint = '$path/revenue/graphs';
+    const endpoint = '/revenue/graphs';
     return fetchDataWithCaching('graphs_revenue', () => mountRequest(endpoint));
   }
 
   Future<Map<String, dynamic>> graphsAdvertising() async {
-    final endpoint = '$path/advertising/graphs';
+    const endpoint = '/advertising/graphs';
     return fetchDataWithCaching('graphs_ads', () => mountRequest(endpoint));
   }
 
   Future<Map<String, dynamic>> graphsInventory() async {
-    final endpoint = '$path/inventory/graphs';
+    const endpoint = '/inventory/graphs';
     return fetchDataWithCaching(
         'graphs_inventory', () => mountRequest(endpoint));
   }
 
   Future<Map<String, dynamic>> tablesAdvertising() async {
-    final endpoint = '$path/advertising/tables';
+    const endpoint = '/advertising/tables';
     return fetchDataWithCaching('tables_ads', () => mountRequest(endpoint));
   }
 
   Future<Map<String, dynamic>> tablesInventory() async {
-    final endpoint = '$path/inventory/tables';
+    const endpoint = '/inventory/tables';
     return fetchDataWithCaching(
         'tables_inventory', () => mountRequest(endpoint));
   }
 
   Future<Map<String, dynamic>> projection() async {
-    final endpoint = '$path/revenue/projection';
+    const endpoint = '/revenue/projection';
     return fetchDataWithCaching(
         'revenue_projection', () => mountRequest(endpoint));
   }
 
   Future<Map<String, dynamic>> primeTable() async {
-    final endpoint = '$path/events/prime-day/table';
+    const endpoint = '/events/prime-day/table';
     return fetchDataWithCaching('prime_table', () => mountRequest(endpoint));
   }
 
   Future<Map<String, dynamic>> primeCards() async {
-    final endpoint = '$path/events/prime-day/cards';
+    const endpoint = '/events/prime-day/cards';
     return fetchDataWithCaching('prime_cards', () => mountRequest(endpoint));
   }
 
   Future<Map<String, dynamic>> primeGraph() async {
-    final endpoint = '$path/events/prime-day/graph';
+    const endpoint = '/events/prime-day/graph';
     return fetchDataWithCaching('prime_graphs', () => mountRequest(endpoint));
   }
 
@@ -287,6 +297,6 @@ class ApiOps {
     };
   }
 
-  getChartData(String defaultVar) {}
-  getCurrentData(String defaultVar) {}
+  void getChartData(String defaultVar) {}
+  void getCurrentData(String defaultVar) {}
 }

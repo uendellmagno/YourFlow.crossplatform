@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:your_flow/services/api_ops.dart';
@@ -14,10 +12,10 @@ class SalesMixView extends StatefulWidget {
 }
 
 class _SalesMixViewState extends State<SalesMixView> {
+  final ApiOps apiOps = ApiOps();
+
   @override
   Widget build(BuildContext context) {
-    final ApiOps apiOps = ApiOps();
-
     return Column(
       children: [
         Padding(
@@ -69,17 +67,27 @@ class SalesMixCard extends StatefulWidget {
 
 class _SalesMixCardState extends State<SalesMixCard> {
   int touchedIndex = -1;
-  List<Color> colorSet = [
-    Color(0xFF016AA8),
-    Color(0xFF008CFF),
-    Color(0xFF132442),
-    Color(0xFF167979),
-    Color(0xFF3baee1),
-    Color(0xFF3b8ac0),
-    Color(0xFF3b6ea8),
-    Color(0xFF3b4e8c),
-    Color(0xFF3b3b6e),
-  ];
+  late List<Color> colorSet;
+
+  @override
+  void initState() {
+    super.initState();
+    colorSet = generateColorSet();
+  }
+
+  List<Color> generateColorSet() {
+    return [
+      Color(0xFF016AA8),
+      Color(0xFF008CFF),
+      Color(0xFF132442),
+      Color(0xFF167979),
+      Color(0xFF3baee1),
+      Color(0xFF3b8ac0),
+      Color(0xFF3b6ea8),
+      Color(0xFF3b4e8c),
+      Color(0xFF3b3b6e),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -116,41 +124,6 @@ class _SalesMixCardState extends State<SalesMixCard> {
                 ),
               ),
             ),
-            // Expanded(
-            //   child: FutureBuilder<Map<String, dynamic>>(
-            //     future: widget.apiOps.graphsRevenue(),
-            //     builder: (context, snapshot) {
-            //       if (snapshot.connectionState == ConnectionState.waiting) {
-            //         return const Center(child: CircularProgressIndicator());
-            //       } else if (snapshot.hasError) {
-            //         return Center(
-            //           child: Text(
-            //             "Error: ${snapshot.error}",
-            //             style: const TextStyle(color: Colors.red),
-            //           ),
-            //         );
-            //       } else {
-            //         final data = snapshot.data;
-            //         return Column(
-            //           children: [
-            //             Text(
-            //               "Revenue: ${data['revenue']}",
-            //               style: const TextStyle(fontSize: 16),
-            //             ),
-            //             Text(
-            //               "Cost: ${data['cost']}",
-            //               style: const TextStyle(fontSize: 16),
-            //             ),
-            //             Text(
-            //               "Profit: ${data['profit']}",
-            //               style: const TextStyle(fontSize: 16),
-            //             ),
-            //           ],
-            //         );
-            //       }
-            //     },
-            //   ),
-            // ),
           ],
         ),
       ),
@@ -226,19 +199,14 @@ class _SalesMixCardState extends State<SalesMixCard> {
     double value, {
     double? radius = 20,
     bool? isTouched = false,
-    List<int>? showTooltips = const [],
   }) {
     return PieChartSectionData(
-      color: randomColorSet(),
+      color: colorSet[value.toInt() % colorSet.length],
       value: value,
       radius: radius,
       title: "$value%",
       titleStyle: textStyle(isTouched: isTouched),
     );
-  }
-
-  Color randomColorSet() {
-    return colorSet[Random().nextInt(colorSet.length)];
   }
 
   TextStyle textStyle({bool? isTouched = false}) {
@@ -253,7 +221,7 @@ class _SalesMixCardState extends State<SalesMixCard> {
       final radius = isTouched ? 25.0 : 20.0;
 
       return pieSectionData(i * 10.0 + 10,
-          isTouched: i == touchedIndex, radius: radius);
+          isTouched: isTouched, radius: radius);
     });
   }
 }
