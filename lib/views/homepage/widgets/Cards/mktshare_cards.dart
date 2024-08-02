@@ -13,9 +13,10 @@ class SalesMixProvider extends StatelessWidget {
       padding: const EdgeInsets.all(10),
       child: Column(
         children: [
-          SalesMixCard(label: "Countries", apiOps: apiOps),
+          SalesMixCard(label: "Countries", apiOps: apiOps, dataType: "country"),
           SizedBox(height: 15),
-          SalesMixCard(label: "Marketplaces", apiOps: apiOps),
+          SalesMixCard(
+              label: "Marketplaces", apiOps: apiOps, dataType: "mktplace"),
         ],
       ),
     );
@@ -25,14 +26,21 @@ class SalesMixProvider extends StatelessWidget {
 class SalesMixCard extends StatefulWidget {
   final ApiOps apiOps;
   final String label;
-  const SalesMixCard({super.key, required this.label, required this.apiOps});
+  final String dataType; // To differentiate between countries and marketplaces
+
+  const SalesMixCard({
+    super.key,
+    required this.label,
+    required this.apiOps,
+    required this.dataType,
+  });
 
   @override
   State<SalesMixCard> createState() => _SalesMixCardState();
 }
 
 class _SalesMixCardState extends State<SalesMixCard> {
-  int touchedIndex = -1;
+  int touchedIndex = -1; // Index of the touched section
   late List<Color> colorSet;
   late Future<Map<String, dynamic>> data;
 
@@ -76,7 +84,8 @@ class _SalesMixCardState extends State<SalesMixCard> {
             } else if (!snapshot.hasData) {
               return const Center(child: Text('No data available'));
             } else {
-              print(snapshot.data);
+              final apiData = snapshot.data![widget.dataType];
+              final pieChartSections = generatePieChartSections(apiData);
               return Column(
                 children: [
                   Padding(
@@ -96,12 +105,12 @@ class _SalesMixCardState extends State<SalesMixCard> {
                   ),
                   Expanded(
                     child: Padding(
-                      padding: EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(8),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          legends(),
-                          pieChart(),
+                          legends(apiData),
+                          pieChart(pieChartSections),
                         ],
                       ),
                     ),
@@ -115,44 +124,27 @@ class _SalesMixCardState extends State<SalesMixCard> {
     );
   }
 
-  legends() {
+  Widget legends(Map<String, dynamic> data) {
     return Column(
-      children: [
-        Row(
+      children: data.entries.map((entry) {
+        final color =
+            colorSet[data.keys.toList().indexOf(entry.key) % colorSet.length];
+        return Row(
           children: [
             Container(
               height: 10,
               width: 10,
-              color: Colors.red,
+              color: color,
             ),
-            Text("Revenue"),
+            SizedBox(width: 5),
+            Text(entry.key),
           ],
-        ),
-        Row(
-          children: [
-            Container(
-              height: 10,
-              width: 10,
-              color: Colors.green,
-            ),
-            Text("Cost"),
-          ],
-        ),
-        Row(
-          children: [
-            Container(
-              height: 10,
-              width: 10,
-              color: Colors.blue,
-            ),
-            Text("Profit"),
-          ],
-        ),
-      ],
+        );
+      }).toList(),
     );
   }
 
-  pieChart() {
+  Widget pieChart(List<PieChartSectionData> sections) {
     return SizedBox(
       height: 200,
       width: 200,
@@ -174,39 +166,33 @@ class _SalesMixCardState extends State<SalesMixCard> {
           ),
           centerSpaceRadius: 40,
           borderData: FlBorderData(show: false),
-          sections: showingData(),
+          sections: sections,
         ),
       ),
     );
   }
 
-  PieChartSectionData pieSectionData(
-    double value, {
-    double? radius = 20,
-    bool? isTouched = false,
-  }) {
-    return PieChartSectionData(
-      color: colorSet[value.toInt() % colorSet.length],
-      value: value,
-      radius: radius,
-      title: "$value%",
-      titleStyle: textStyle(isTouched: isTouched),
-    );
-  }
-
-  TextStyle textStyle({bool? isTouched = false}) {
+  TextStyle textStyle({bool isTouched = false}) {
     return TextStyle(
-      fontSize: isTouched! ? 21 : 16,
+      fontSize: isTouched ? 21 : 16,
+      fontWeight: FontWeight.bold,
+      color: isTouched ? Colors.white : Colors.black,
     );
   }
 
-  List<PieChartSectionData> showingData() {
-    return List.generate(5, (i) {
-      final isTouched = i == touchedIndex;
-      final radius = isTouched ? 25.0 : 20.0;
-
-      return pieSectionData(i * 10.0 + 10,
-          isTouched: isTouched, radius: radius);
-    });
+  List<PieChartSectionData> generatePieChartSections(
+      Map<String, dynamic> data) {
+    return data.entries.toList().asMap().entries.map((entry) {
+      final index = entry.key;
+      final pieEntry = entry.value.value;
+      final isTouched = index == touchedIndex;
+      return PieChartSectionData(
+        color: colorSet[index % colorSet.length],
+        value: pieEntry.toDouble(),
+        title: "$pieEntry%",
+        radius: isTouched ? 25.0 : 20.0,
+        titleStyle: textStyle(isTouched: isTouched),
+      );
+    }).toList();
   }
 }
