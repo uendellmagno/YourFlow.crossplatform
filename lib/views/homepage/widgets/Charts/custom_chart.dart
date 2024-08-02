@@ -3,6 +3,7 @@ library;
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:your_flow/services/api_ops.dart';
@@ -202,17 +203,37 @@ class CustomChart extends State<CChartState> {
   // This function will build the dropdown button
   Padding buildDropdownButton() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: SizedBox(
-        width: double.infinity,
-        height: 60,
-        child: DropdownButton(
-          icon: const Icon(Icons.arrow_drop_down_circle_rounded),
-          value: _dropdownValue,
-          underline: Container(),
-          items: dropdownItems,
-          onChanged: dropdownCallback,
-          isExpanded: true,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: SizedBox(
+          width: double.infinity,
+          height: 60,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                icon: const Icon(Icons.arrow_drop_down_rounded),
+                value: _dropdownValue,
+                borderRadius: BorderRadius.circular(12),
+
+                hint: const Text('Select a category'),
+                enableFeedback: true,
+                menuMaxHeight: 300,
+                isDense: true,
+                alignment: AlignmentDirectional.center,
+                items: dropdownItems,
+                onChanged: dropdownCallback,
+                isExpanded: true,
+                dropdownColor: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey[900]
+                    : Colors.white,
+                focusColor: Colors.transparent, // Remove focus highlight color
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -221,7 +242,7 @@ class CustomChart extends State<CChartState> {
   // This function will build the toggle buttons
   Padding buildToggleButtons() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 7),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -239,9 +260,16 @@ class CustomChart extends State<CChartState> {
       flex: 3,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor:
-              isSelected ? const Color(0xFF016AA8) : Colors.grey[200],
-          foregroundColor: isSelected ? Colors.white : Colors.black,
+          backgroundColor: isSelected
+              ? const Color(0xFF016AA8)
+              : Theme.of(context).brightness == Brightness.dark
+                  ? Colors.grey[900]
+                  : Colors.grey[200],
+          foregroundColor: isSelected
+              ? Colors.white
+              : Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white
+                  : Colors.black,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
           ),
