@@ -63,8 +63,6 @@ class CustomChart extends State<CChartState> {
         _dropdownValue = items.isNotEmpty ? items[0].value : null;
         dropdownItems = items;
       });
-    }).catchError((error) {
-      print('Error fetching data: $error');
     });
   }
 
@@ -122,7 +120,7 @@ class CustomChart extends State<CChartState> {
           children: [
             Text(
               _dropdownValue?.split('|')[1] ?? "Loading...",
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
             ),
             FutureBuilder<Map<String, dynamic>>(
               future: data,
@@ -131,9 +129,9 @@ class CustomChart extends State<CChartState> {
                   return LoadingAnimationWidget.waveDots(
                       color: Theme.of(context).primaryColor, size: 40);
                 } else if (snapshot.hasError) {
-                  return Text('Error loading data');
+                  return const Text('Error loading data');
                 } else if (!snapshot.hasData) {
-                  return Text('No data available');
+                  return const Text('No data available');
                 } else {
                   return buildTotalValueText(snapshot);
                 }
@@ -158,11 +156,11 @@ class CustomChart extends State<CChartState> {
         var totalValue = values.isNotEmpty ? values.last : 0;
         return Text(
           NumberFormat.simpleCurrency().format(totalValue),
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         );
       }
     }
-    return Text('No data available');
+    return const Text('No data available');
   }
 
   // This function will build the card body
@@ -184,7 +182,7 @@ class CustomChart extends State<CChartState> {
         width: double.infinity,
         height: 60,
         child: DropdownButton(
-          icon: Icon(Icons.arrow_drop_down_circle_rounded),
+          icon: const Icon(Icons.arrow_drop_down_circle_rounded),
           value: _dropdownValue,
           underline: Container(),
           items: dropdownItems,
@@ -216,7 +214,7 @@ class CustomChart extends State<CChartState> {
       flex: 3,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: isSelected ? Color(0xFF016AA8) : Colors.grey[200],
+          backgroundColor: isSelected ? const Color(0xFF016AA8) : Colors.grey[200],
           foregroundColor: isSelected ? Colors.white : Colors.black,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
@@ -286,8 +284,8 @@ class CustomChart extends State<CChartState> {
                     touchedIndex = barTouchResponse.spot!.touchedBarGroupIndex;
                   });
                 }),
-            gridData: FlGridData(show: false),
-            titlesData: FlTitlesData(
+            gridData: const FlGridData(show: false),
+            titlesData: const FlTitlesData(
               show: true,
               leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
               rightTitles:
@@ -314,8 +312,8 @@ class CustomChart extends State<CChartState> {
     return BarChartGroupData(x: x, barRods: [
       BarChartRodData(
         toY: isTouched ? y + 2 : y,
-        borderRadius: BorderRadius.all(Radius.circular(4)),
-        color: Color(0xFF016AA8),
+        borderRadius: const BorderRadius.all(Radius.circular(4)),
+        color: const Color(0xFF016AA8),
         width: width,
       ),
     ]);
