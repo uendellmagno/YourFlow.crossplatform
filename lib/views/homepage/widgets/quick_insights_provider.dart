@@ -30,8 +30,8 @@ class _QuickInsightsView extends State<QuickInsightsView> {
           ),
         ),
         const SizedBox(height: 10),
-        QICardsList(apiOps: apiOps),
-        CChartState(),
+        QICardsState(apiOps: apiOps),
+        CChartState(apiOps: apiOps),
       ],
     );
   }

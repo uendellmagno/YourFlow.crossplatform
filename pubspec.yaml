@@ -50,6 +50,8 @@ dependencies:
   shared_preferences: ^2.2.3
   email_validator: ^3.0.0
   connectivity_plus: ^6.0.4
+  dio: ^5.5.0+1
+  intl: ^0.19.0
 
 dev_dependencies:
   flutter_test:
