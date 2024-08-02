@@ -15,10 +15,10 @@ class BoxedLineChart extends StatefulWidget {
   });
 
   @override
-  _BoxedLineChartState createState() => _BoxedLineChartState();
+  BoxedLineChartState createState() => BoxedLineChartState();
 }
 
-class _BoxedLineChartState extends State<BoxedLineChart> {
+class BoxedLineChartState extends State<BoxedLineChart> {
   late Future<Map<String, dynamic>> data;
 
   @override
@@ -158,10 +158,8 @@ class CustomLineChart extends StatelessWidget {
           child: LineChart(
             LineChartData(
               lineTouchData: const LineTouchData(
-
                 touchTooltipData: LineTouchTooltipData(
                   showOnTopOfTheChartBoxArea: true,
-
                 ),
               ),
               gridData: const FlGridData(show: false),

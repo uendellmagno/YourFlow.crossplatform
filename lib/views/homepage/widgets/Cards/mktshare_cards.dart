@@ -14,7 +14,7 @@ class SalesMixProvider extends StatelessWidget {
       child: Column(
         children: [
           SalesMixCard(label: "Countries", apiOps: apiOps, dataType: "country"),
-          SizedBox(height: 15),
+          // const SizedBox(height: 15),
           SalesMixCard(
               label: "Marketplaces", apiOps: apiOps, dataType: "mktplace"),
         ],
@@ -53,15 +53,15 @@ class _SalesMixCardState extends State<SalesMixCard> {
 
   List<Color> generateColorSet() {
     return [
-      Color(0xFF016AA8),
-      Color(0xFF008CFF),
-      Color(0xFF132442),
-      Color(0xFF167979),
-      Color(0xFF3baee1),
-      Color(0xFF3b8ac0),
-      Color(0xFF3b6ea8),
-      Color(0xFF3b4e8c),
-      Color(0xFF3b3b6e),
+      const Color(0xFF016AA8),
+      const Color(0xFF008CFF),
+      const Color(0xFF132442),
+      const Color(0xFF167979),
+      const Color(0xFF3baee1),
+      const Color(0xFF3b8ac0),
+      const Color(0xFF3b6ea8),
+      const Color(0xFF3b4e8c),
+      const Color(0xFF3b3b6e),
     ];
   }
 
@@ -114,7 +114,7 @@ class _SalesMixCardState extends State<SalesMixCard> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Flexible(flex: 3, child: legends(apiData)),
-                          SizedBox(width: 10),
+                          const SizedBox(width: 10),
                           Flexible(
                             flex: 4,
                             child: LayoutBuilder(
@@ -156,7 +156,7 @@ class _SalesMixCardState extends State<SalesMixCard> {
                 width: 10,
                 color: color,
               ),
-              SizedBox(width: 5),
+              const SizedBox(width: 5),
               Text(entry.key),
             ],
           ),

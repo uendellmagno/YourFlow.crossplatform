@@ -6,10 +6,10 @@ class ProductsRankingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Column(
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 20, top: 20),
+          padding: EdgeInsets.only(left: 20, top: 20),
           child: Row(
             children: [
               Icon(FontAwesomeIcons.fireFlameCurved, size: 17),
@@ -18,7 +18,7 @@ class ProductsRankingView extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
       ],
     );
   }

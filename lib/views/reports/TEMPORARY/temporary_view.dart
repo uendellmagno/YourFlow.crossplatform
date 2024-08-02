@@ -13,8 +13,8 @@ class TemporaryView extends StatelessWidget {
     return SingleChildScrollView(
       child: Wrap(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(12),
+          const Padding(
+            padding: EdgeInsets.all(12),
             child: Row(
               children: [
                 Icon(Icons.bar_chart_rounded, size: 20),
@@ -44,8 +44,8 @@ class TemporaryView extends StatelessWidget {
             category: "Revenue",
             keyName: "Price",
           ),
-          Padding(
-            padding: const EdgeInsets.all(12.0),
+          const Padding(
+            padding: EdgeInsets.all(12.0),
             child: Row(
               children: [
                 Icon(FontAwesomeIcons.bullhorn, size: 17),
@@ -124,8 +124,8 @@ class TemporaryView extends StatelessWidget {
             category: "Marketing",
             keyName: "Clicks",
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
+          const Padding(
+            padding: EdgeInsets.all(8.0),
             child: Row(
               children: [
                 Icon(FontAwesomeIcons.bullhorn, size: 20),

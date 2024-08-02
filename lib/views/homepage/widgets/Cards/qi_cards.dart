@@ -185,22 +185,22 @@ class QICard extends StatelessWidget {
               "1 Day",
               cardData['delta']['1'],
               cardData['delta']['1'] >= 0
-                  ? Color(0xFF137201)
-                  : Color(0xFFBA1313)),
+                  ? const Color(0xFF137201)
+                  : const Color(0xFFBA1313)),
           _buildDeltaRow(
               context,
               "7 Days",
               cardData['delta']['7'],
               cardData['delta']['7'] >= 0
-                  ? Color(0xFF137201)
-                  : Color(0xFFBA1313)),
+                  ? const Color(0xFF137201)
+                  : const Color(0xFFBA1313)),
           _buildDeltaRow(
               context,
               "30 Days",
               cardData['delta']['30'],
               cardData['delta']['30'] >= 0
-                  ? Color(0xFF137201)
-                  : Color(0xFFBA1313)),
+                  ? const Color(0xFF137201)
+                  : const Color(0xFFBA1313)),
         ],
       ),
     );

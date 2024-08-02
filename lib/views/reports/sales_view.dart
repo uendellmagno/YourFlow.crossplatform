@@ -17,14 +17,14 @@ class SalesView extends StatelessWidget {
         centerTitle: true,
       ),
       body: Padding(
-        padding: EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(8.0),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF5c6bc0),
+                  backgroundColor: const Color(0xFF5c6bc0),
                   enableFeedback: true,
                   splashFactory: InkRipple.splashFactory,
                   shape: RoundedRectangleBorder(
@@ -42,8 +42,8 @@ class SalesView extends StatelessWidget {
                     builder: (context) => const TemporaryView(),
                   );
                 },
-                child: Padding(
-                  padding: const EdgeInsets.only(
+                child: const Padding(
+                  padding: EdgeInsets.only(
                     top: 17,
                     bottom: 17,
                   ),

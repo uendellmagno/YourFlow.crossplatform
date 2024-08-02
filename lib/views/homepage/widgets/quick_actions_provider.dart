@@ -86,7 +86,7 @@ class QuickActionItem extends StatelessWidget {
             //   MaterialPageRoute(builder: (context) => view),
             // );
             showModalBottomSheet(
-              shape: BeveledRectangleBorder(
+              shape: const BeveledRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(20)),
               ),
               context: context,
