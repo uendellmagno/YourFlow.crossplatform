@@ -55,7 +55,7 @@ class _SalesMixCardState extends State<SalesMixCard> {
     return [
       const Color(0xFF016AA8),
       const Color(0xFF008CFF),
-      const Color(0xFF132442),
+      const Color.fromARGB(255, 45, 67, 104),
       const Color(0xFF167979),
       const Color(0xFF3baee1),
       const Color(0xFF3b8ac0),

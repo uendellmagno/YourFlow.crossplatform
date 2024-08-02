@@ -58,10 +58,10 @@ class CustomChart extends State<CChartState> {
         addDropdownItems(dataMap['Marketing'], 'Marketing');
       }
 
-      // Update the dropdown value and items
+      // Update the dropdown items and keep the current _dropdownValue if it exists
       setState(() {
-        _dropdownValue = items.isNotEmpty ? items[0].value : null;
         dropdownItems = items;
+        _dropdownValue ??= items.isNotEmpty ? items[0].value : null;
       });
     });
   }
@@ -119,7 +119,11 @@ class CustomChart extends State<CChartState> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              _dropdownValue?.split('|')[1] ?? "Loading...",
+              _dropdownValue != null
+                  ? _dropdownValue!.split('|')[1] == '% Organic'
+                      ? 'Organic Sales'
+                      : _dropdownValue!.split('|')[1]
+                  : "Loading...",
               style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
             ),
             FutureBuilder<Map<String, dynamic>>(
@@ -143,21 +147,42 @@ class CustomChart extends State<CChartState> {
     );
   }
 
-  // This function will build the total value text
   Text buildTotalValueText(AsyncSnapshot<Map<String, dynamic>> snapshot) {
     var category = _dropdownValue?.split('|')[0];
     var key = _dropdownValue?.split('|')[1];
     var section = snapshot.data![category];
+
     if (key != null && section != null) {
       var selectedData = section[key];
       if (selectedData != null) {
         var totalKey = _isDailySelected ? 'days' : 'months';
         var values = selectedData[totalKey]?['values'] ?? [];
-        var totalValue = values.isNotEmpty ? values.last : 0;
-        return Text(
-          NumberFormat.simpleCurrency().format(totalValue),
-          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-        );
+        var totalValue = values.isNotEmpty ? values.last : 0.0;
+
+        // Define different formatting rules based on the key
+        if (['Total Sales', 'Price', 'ADS Sales', 'ADS Spend'].contains(key)) {
+          return Text(
+            NumberFormat.simpleCurrency().format(totalValue),
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          );
+        } else if ([
+          '% Organic',
+          'ROAS',
+          'CTR',
+          'TACOS',
+          'CPC',
+          'Conversion Rate'
+        ].contains(key)) {
+          return Text(
+            '${totalValue.toStringAsFixed(2)}%',
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          );
+        } else if (['Units', 'Impressions', 'Clicks'].contains(key)) {
+          return Text(
+            NumberFormat.decimalPattern().format(totalValue),
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          );
+        }
       }
     }
     return const Text('No data available');
@@ -214,7 +239,8 @@ class CustomChart extends State<CChartState> {
       flex: 3,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: isSelected ? const Color(0xFF016AA8) : Colors.grey[200],
+          backgroundColor:
+              isSelected ? const Color(0xFF016AA8) : Colors.grey[200],
           foregroundColor: isSelected ? Colors.white : Colors.black,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
@@ -311,7 +337,7 @@ class CustomChart extends State<CChartState> {
   }) {
     return BarChartGroupData(x: x, barRods: [
       BarChartRodData(
-        toY: isTouched ? y + 2 : y,
+        toY: isTouched ? y + 1 : y,
         borderRadius: const BorderRadius.all(Radius.circular(4)),
         color: const Color(0xFF016AA8),
         width: width,
