@@ -1,5 +1,4 @@
 import 'dart:core';
-
 import 'package:flutter/material.dart';
 import 'package:your_flow/services/api_ops.dart';
 import 'package:your_flow/views/homepage/widgets/Cards/qi_cards.dart';
@@ -9,10 +8,10 @@ class QuickInsightsView extends StatefulWidget {
   const QuickInsightsView({super.key});
 
   @override
-  _QuickInsightsView createState() => _QuickInsightsView();
+  QuickInsightsViewState createState() => QuickInsightsViewState();
 }
 
-class _QuickInsightsView extends State<QuickInsightsView> {
+class QuickInsightsViewState extends State<QuickInsightsView> {
   final ApiOps apiOps = ApiOps();
 
   @override

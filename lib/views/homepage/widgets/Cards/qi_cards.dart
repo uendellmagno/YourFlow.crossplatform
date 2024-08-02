@@ -99,7 +99,7 @@ class QICard extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 230,
-      width: 190,
+      width: 180,
       child: Card(
         child: FutureBuilder<Map<String, dynamic>>(
           future: data,
@@ -111,7 +111,7 @@ class QICard extends StatelessWidget {
               );
             } else if (snapshot.hasError) {
               return const Center(child: Text('Error loading data'));
-            } else if (!snapshot.hasData) {
+            } else if (!snapshot.hasData || snapshot.data![category] == null) {
               return const Center(child: Text('No data available'));
             } else {
               final cardData = snapshot.data![category][keyName];
@@ -168,7 +168,7 @@ class QICard extends StatelessWidget {
     } else if (type == "USD") {
       return NumberFormat.simpleCurrency(name: 'USD').format(value);
     } else if (type == 'QTD.') {
-      return "${value.toStringAsFixed(0)}";
+      return NumberFormat.decimalPattern("en_US").format(value);
     } else {
       return value.toString(); // Default formatting
     }
@@ -207,7 +207,7 @@ class QICard extends StatelessWidget {
   }
 
   Row _buildDeltaRow(
-      BuildContext context, String label, double value, Color valueColor) {
+      BuildContext context, String label, value, Color valueColor) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [

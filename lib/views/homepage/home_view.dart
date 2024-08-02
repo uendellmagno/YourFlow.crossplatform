@@ -141,14 +141,12 @@ class _HomeViewState extends State<HomeView> {
                 IconButton(
                   onPressed: () {
                     HapticFeedback.selectionClick();
-
-                    // TODO - Or a Navigator.push()?
-                    showModalBottomSheet(
-                        shape: const BeveledRectangleBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(20))),
-                        context: context,
-                        builder: (context) => const NotificationsView());
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const NotificationsView(),
+                      ),
+                    );
                   },
                   enableFeedback: true,
                   icon: const Icon(Icons.notifications),

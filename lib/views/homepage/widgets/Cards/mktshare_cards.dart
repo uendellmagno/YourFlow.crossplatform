@@ -105,12 +105,29 @@ class _SalesMixCardState extends State<SalesMixCard> {
                   ),
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.only(
+                        left: 12,
+                        right: 12,
+                        bottom: 12,
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          legends(apiData),
-                          pieChart(pieChartSections),
+                          Flexible(flex: 3, child: legends(apiData)),
+                          SizedBox(width: 10),
+                          Flexible(
+                            flex: 4,
+                            child: LayoutBuilder(
+                              builder: (context, constraints) {
+                                final size = constraints.maxHeight;
+                                return SizedBox(
+                                  height: size,
+                                  width: size,
+                                  child: pieChart(pieChartSections),
+                                );
+                              },
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -126,28 +143,31 @@ class _SalesMixCardState extends State<SalesMixCard> {
 
   Widget legends(Map<String, dynamic> data) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: data.entries.map((entry) {
         final color =
             colorSet[data.keys.toList().indexOf(entry.key) % colorSet.length];
-        return Row(
-          children: [
-            Container(
-              height: 10,
-              width: 10,
-              color: color,
-            ),
-            SizedBox(width: 5),
-            Text(entry.key),
-          ],
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: Row(
+            children: [
+              Container(
+                height: 10,
+                width: 10,
+                color: color,
+              ),
+              SizedBox(width: 5),
+              Text(entry.key),
+            ],
+          ),
         );
       }).toList(),
     );
   }
 
   Widget pieChart(List<PieChartSectionData> sections) {
-    return SizedBox(
-      height: 200,
-      width: 200,
+    return AspectRatio(
+      aspectRatio: 1,
       child: PieChart(
         PieChartData(
           pieTouchData: PieTouchData(
@@ -164,8 +184,8 @@ class _SalesMixCardState extends State<SalesMixCard> {
               });
             },
           ),
-          centerSpaceRadius: 40,
           borderData: FlBorderData(show: false),
+          startDegreeOffset: 180,
           sections: sections,
         ),
       ),
@@ -174,9 +194,8 @@ class _SalesMixCardState extends State<SalesMixCard> {
 
   TextStyle textStyle({bool isTouched = false}) {
     return TextStyle(
-      fontSize: isTouched ? 21 : 16,
+      fontSize: isTouched ? 20 : 14,
       fontWeight: FontWeight.bold,
-      color: isTouched ? Colors.white : Colors.black,
     );
   }
 
@@ -186,11 +205,13 @@ class _SalesMixCardState extends State<SalesMixCard> {
       final index = entry.key;
       final pieEntry = entry.value.value;
       final isTouched = index == touchedIndex;
+
       return PieChartSectionData(
+        titlePositionPercentageOffset: 1.5,
         color: colorSet[index % colorSet.length],
         value: pieEntry.toDouble(),
-        title: "$pieEntry%",
-        radius: isTouched ? 25.0 : 20.0,
+        title: touchedIndex == -1 || isTouched ? "$pieEntry%" : "",
+        radius: isTouched ? 30.0 : 25.0,
         titleStyle: textStyle(isTouched: isTouched),
       );
     }).toList();

@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:your_flow/services/api_ops.dart';
 
@@ -12,9 +13,9 @@ class CChartState extends StatefulWidget {
 }
 
 class CustomChart extends State<CChartState> {
-  String? _dropdownValue = 'Loading...'; // Initialize with a default value
+  String? _dropdownValue; // Initialize without a default value
 
-  bool _isDailySelected = false;
+  bool _isDailySelected = true;
   int touchedIndex = -1;
 
   late Future<Map<String, dynamic>> data;
@@ -23,40 +24,42 @@ class CustomChart extends State<CChartState> {
   @override
   void initState() {
     super.initState();
+    fetchData();
+  }
+
+  void fetchData() {
     data = widget.apiOps.graphsHome();
     data.then((dataMap) {
-      // Initialize an empty list for dropdown items
       List<DropdownMenuItem<String>> dropdownItems = [];
 
-      // Function to add DropdownMenuItems for given keys
-      void addDropdownItems(Map<String, dynamic> section) {
-        dropdownItems.addAll(
-          section.keys.map((key) {
-            return DropdownMenuItem<String>(
-              value: key,
-              child: Text(key),
-            );
-          }).toList(),
-        );
+      void addDropdownItems(Map<String, dynamic>? section, String category) {
+        if (section != null) {
+          dropdownItems.addAll(
+            section.keys.map((key) {
+              return DropdownMenuItem<String>(
+                value: key,
+                key: Key(category),
+                child: Text(key),
+              );
+            }).toList(),
+          );
+        }
       }
 
-      // Check for and add keys from 'Revenue' and 'Marketing'
       if (dataMap.containsKey('Revenue')) {
-        addDropdownItems(dataMap['Revenue']);
+        addDropdownItems(dataMap['Revenue'], 'Revenue');
       }
 
       if (dataMap.containsKey('Marketing')) {
-        addDropdownItems(dataMap['Marketing']);
+        addDropdownItems(dataMap['Marketing'], 'Marketing');
       }
 
       setState(() {
-        // Set the dropdown items and default selected value
         _dropdownValue =
             dropdownItems.isNotEmpty ? dropdownItems[0].value : null;
         this.dropdownItems = dropdownItems;
       });
     }).catchError((error) {
-      // Handle any errors from fetching data
       print('Error fetching data: $error');
     });
   }
@@ -69,8 +72,6 @@ class CustomChart extends State<CChartState> {
 
   @override
   Widget build(BuildContext context) {
-    // print(data.toString);
-    // print(_dropdownValue);
     return Column(
       children: [
         Padding(
@@ -94,25 +95,56 @@ class CustomChart extends State<CChartState> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Total Sales",
+                            _dropdownValue ?? "Loading...",
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                          Text(
-                            "\$ 1,257,992",
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          FutureBuilder<Map<String, dynamic>>(
+                            future: data,
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return LoadingAnimationWidget.waveDots(
+                                    color: Theme.of(context).primaryColor,
+                                    size: 40);
+                              } else if (snapshot.hasError) {
+                                return Text('Error loading data');
+                              } else if (!snapshot.hasData) {
+                                return Text('No data available');
+                              } else {
+                                var section = snapshot.data!['Revenue'];
+                                if (_dropdownValue != null && section != null) {
+                                  var selectedData = section[_dropdownValue];
+                                  if (selectedData != null) {
+                                    var totalKey =
+                                        _isDailySelected ? 'days' : 'months';
+                                    var values =
+                                        selectedData[totalKey]?['values'] ?? [];
+                                    var totalValue = values.isNotEmpty
+                                        ? values.last
+                                        : 0; // Get last value
+                                    return Text(
+                                      NumberFormat.simpleCurrency()
+                                          .format(totalValue),
+                                      style: TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    );
+                                  }
+                                }
+                                return Text('No data available');
+                              }
+                            },
                           ),
                         ],
                       ),
                     ),
                   ),
-                  const Spacer(),
-                  Flexible(
+                  Expanded(
+                    // Changed to Expanded
                     flex: 5,
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -152,12 +184,11 @@ class CustomChart extends State<CChartState> {
                   onPressed: () {
                     setState(() {
                       _isDailySelected = true;
+                      fetchData();
                     });
                   },
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 10,
-                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
                     child: Text('Daily'),
                   ),
                 ),
@@ -179,6 +210,7 @@ class CustomChart extends State<CChartState> {
                   onPressed: () {
                     setState(() {
                       _isDailySelected = false;
+                      fetchData();
                     });
                   },
                   child: Padding(
@@ -219,47 +251,56 @@ class CustomChart extends State<CChartState> {
         } else if (!snapshot.hasData) {
           return const Center(child: Text('No data available'));
         } else {
-          return BarChart(
-            BarChartData(
-              barTouchData: BarTouchData(
-                  touchTooltipData: BarTouchTooltipData(
-                    fitInsideHorizontally: true,
-                    tooltipHorizontalAlignment: FLHorizontalAlignment.right,
-                    tooltipMargin: -10,
+          var section = snapshot.data!['Revenue'];
+          if (_dropdownValue != null && section != null) {
+            var selectedData = section[_dropdownValue];
+            if (selectedData != null) {
+              var key = _isDailySelected ? 'days' : 'months';
+              var values = selectedData[key]?['values'] ?? [];
+              return BarChart(
+                BarChartData(
+                  barTouchData: BarTouchData(
+                      touchTooltipData: BarTouchTooltipData(
+                        fitInsideHorizontally: true,
+                        tooltipHorizontalAlignment: FLHorizontalAlignment.right,
+                        tooltipMargin: -10,
+                      ),
+                      touchCallback: (FlTouchEvent event, barTouchResponse) {
+                        setState(() {
+                          if (!event.isInterestedForInteractions ||
+                              barTouchResponse == null ||
+                              barTouchResponse.spot == null) {
+                            touchedIndex = -1;
+                            return;
+                          }
+                          touchedIndex =
+                              barTouchResponse.spot!.touchedBarGroupIndex;
+                        });
+                      }),
+                  gridData: FlGridData(
+                    show: false,
                   ),
-                  touchCallback: (FlTouchEvent event, barTouchResponse) {
-                    setState(() {
-                      if (!event.isInterestedForInteractions ||
-                          barTouchResponse == null ||
-                          barTouchResponse.spot == null) {
-                        touchedIndex = -1;
-                        return;
-                      }
-                      touchedIndex =
-                          barTouchResponse.spot!.touchedBarGroupIndex;
-                    });
-                  }),
-              gridData: FlGridData(
-                show: false,
-              ),
-              titlesData: FlTitlesData(
-                show: true,
-                leftTitles: AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
+                  titlesData: FlTitlesData(
+                    show: true,
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    rightTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    topTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                  ),
+                  borderData: FlBorderData(
+                    show: false,
+                  ),
+                  barGroups: showingGroups(values),
                 ),
-                rightTitles: AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
-                ),
-                topTitles: AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
-                ),
-              ),
-              borderData: FlBorderData(
-                show: false,
-              ),
-              barGroups: showingGroups(snapshot.data!),
-            ),
-          );
+              );
+            }
+          }
+          return const Center(child: Text('No data available'));
         }
       },
     );
@@ -282,23 +323,11 @@ class CustomChart extends State<CChartState> {
     ]);
   }
 
-  List<BarChartGroupData> showingGroups(Map<String, dynamic> data) {
-    return data.keys.map((entry) {
-      //TODO - print('HEY THE KEY IS RIGHT HERE: $entry, Value: ${data[entry]}');
-      return barGroupData(entry.hashCode, 2);
+  List<BarChartGroupData> showingGroups(List<dynamic> data) {
+    return data.asMap().entries.map((entry) {
+      int index = entry.key;
+      double value = entry.value.toDouble();
+      return barGroupData(index, value);
     }).toList();
   }
 }
-
-// List<BarChartGroupData> showingGroups(Map<String, dynamic> data) {
-//   List<BarChartGroupData> barChartGroupData = [];
-//   int index = 0;
-  
-//   data.forEach((key, value) {
-//     print('Key: $key, Value: $value');
-//     barChartGroupData.add(barGroupData(index, value));
-//     index++;
-//   });
-
-//   return barChartGroupData;
-// }
