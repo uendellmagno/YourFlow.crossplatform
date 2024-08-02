@@ -115,7 +115,6 @@ class QICard extends StatelessWidget {
               return const Center(child: Text('No data available'));
             } else {
               final cardData = snapshot.data![category][keyName];
-              print(cardData);
               return Column(
                 children: [
                   Padding(

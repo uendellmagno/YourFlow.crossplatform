@@ -284,7 +284,7 @@ class CustomChart extends State<CChartState> {
 
   List<BarChartGroupData> showingGroups(Map<String, dynamic> data) {
     return data.keys.map((entry) {
-      print('HEY THE KEY IS RIGHT HERE: $entry, Value: ${data[entry]}');
+      //TODO - print('HEY THE KEY IS RIGHT HERE: $entry, Value: ${data[entry]}');
       return barGroupData(entry.hashCode, 2);
     }).toList();
   }
