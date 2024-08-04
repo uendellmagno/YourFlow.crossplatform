@@ -80,8 +80,8 @@ class View extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8.0),
                 child: Image.asset(
                   Theme.of(context).brightness == Brightness.dark
-                      ? 'assets/images/SellersFlowDot_logoDarkMode.png'
-                      : 'assets/images/SellersFlowDot_logo.png',
+                      ? 'assets/images/HozSF-white.png'
+                      : 'assets/images/HozSF-blueDark.png',
                   height: 75,
                   fit: BoxFit.cover,
                 ),

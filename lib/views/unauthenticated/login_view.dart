@@ -63,13 +63,6 @@ class LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'SF YourFlow',
-          style: TextStyle(fontSize: 18),
-        ),
-        centerTitle: true,
-      ),
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
@@ -83,8 +76,8 @@ class LoginScreenState extends State<LoginScreen> {
                     borderRadius: BorderRadius.circular(8.0),
                     child: Image.asset(
                       Theme.of(context).brightness == Brightness.dark
-                          ? 'assets/images/SellersFlowDot_logoDarkMode.png'
-                          : 'assets/images/SellersFlowDot_logo.png',
+                          ? 'assets/images/HozSF-white.png'
+                          : 'assets/images/HozSF-blueDark.png',
                       height: 75,
                       fit: BoxFit.cover,
                     ),

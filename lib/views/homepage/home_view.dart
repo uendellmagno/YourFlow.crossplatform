@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:your_flow/services/app_state_core.dart';
-import 'package:your_flow/views/homepage/widgets/products_ranking_provider.dart';
+// import 'package:your_flow/views/homepage/widgets/products_ranking_provider.dart';
 import 'package:your_flow/views/homepage/widgets/quick_actions_provider.dart';
 import 'package:your_flow/views/homepage/widgets/quick_insights_provider.dart';
 import 'package:your_flow/views/homepage/widgets/sales_mix_provider.dart';
@@ -194,7 +194,7 @@ class YFHomeView extends StatelessWidget {
             children: [
               QuickInsightsView(),
               SalesMixView(),
-              ProductsRankingView(),
+              // ProductsRankingView(),
             ],
           ),
         ],
