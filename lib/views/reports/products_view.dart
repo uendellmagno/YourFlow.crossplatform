@@ -24,10 +24,10 @@ class ProductsView extends StatelessWidget {
           //   onPressed: () {},
           // ),
           IconButton(
-            icon: Icon(Icons.filter_alt_rounded),
+            icon: const Icon(Icons.filter_alt_rounded),
             onPressed: () {
               showModalBottomSheet(
-                shape: BeveledRectangleBorder(
+                shape: const BeveledRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(20)),
                 ),
                 context: context,
@@ -64,12 +64,12 @@ class YFInventoryView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 IDayChartView(apiOps: apiOps),
-                SizedBox(height: 15),
+                const SizedBox(height: 15),
                 InventoryMetrics(),
-                SizedBox(height: 15),
-                ReviewsSummary(),
-                SizedBox(height: 15),
-                ProductsRanking(),
+                const SizedBox(height: 15),
+                const ReviewsSummary(),
+                const SizedBox(height: 15),
+                const ProductsRanking(),
               ],
             ),
           )
@@ -88,8 +88,8 @@ class IDayChartView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 20, top: 20),
+        const Padding(
+          padding: EdgeInsets.only(left: 20, top: 20),
           child: Row(
             children: [
               Icon(Icons.warehouse_rounded, size: 15),
@@ -98,7 +98,7 @@ class IDayChartView extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         IDayChartProvider(
           fetchData: apiOps.graphsInventory,
         ),
@@ -128,7 +128,7 @@ class _IDayChartState extends State<IDayChartProvider> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(8.0),
       child: SizedBox(
         width: double.infinity,
         height: 300,
@@ -140,8 +140,8 @@ class _IDayChartState extends State<IDayChartProvider> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 15, left: 15),
+              const Padding(
+                padding: EdgeInsets.only(top: 15, left: 15),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -162,7 +162,7 @@ class _IDayChartState extends State<IDayChartProvider> {
                   ],
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               ClipRRect(
                 borderRadius: BorderRadius.circular(15),
                 child: FutureBuilder<Map<String, dynamic>>(
@@ -212,7 +212,7 @@ class IDayChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(left: 15, right: 15, bottom: 10),
+      padding: const EdgeInsets.only(left: 15, right: 15, bottom: 10),
       child: SizedBox(
         height: 175,
         width: double.infinity,
@@ -283,10 +283,10 @@ class InventoryMetrics extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Column(
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 20, top: 20),
+          padding: EdgeInsets.only(left: 20, top: 20),
           child: Row(
             children: [
               Icon(Icons.bar_chart_rounded, size: 17),
@@ -296,7 +296,7 @@ class InventoryMetrics extends StatelessWidget {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.only(top: 20, bottom: 20),
+          padding: EdgeInsets.only(top: 20, bottom: 20),
           child: Wrap(
             spacing: 10,
             runSpacing: 10,
@@ -360,10 +360,10 @@ class MetricsCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(top: 10),
               child: Text(title,
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
             ),
             Text(metric,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
           ],
         ),
       ),
@@ -379,8 +379,8 @@ class ReviewsSummary extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 20, top: 20),
+        const Padding(
+          padding: EdgeInsets.only(left: 20, top: 20),
           child: Row(
             children: [
               Icon(Icons.thumbs_up_down_rounded, size: 15),
@@ -389,7 +389,7 @@ class ReviewsSummary extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         Container(
           height: 200,
           width: double.infinity,
@@ -408,8 +408,8 @@ class ProductsRanking extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 20, top: 20),
+        const Padding(
+          padding: EdgeInsets.only(left: 20, top: 20),
           child: Row(
             children: [
               Icon(FontAwesomeIcons.fireFlameCurved, size: 15),
@@ -418,7 +418,7 @@ class ProductsRanking extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         Container(
           height: 200,
           width: double.infinity,

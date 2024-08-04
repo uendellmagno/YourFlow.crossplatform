@@ -18,8 +18,8 @@ class _SalesMixViewState extends State<SalesMixView> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 20, top: 20),
+        const Padding(
+          padding: EdgeInsets.only(left: 20, top: 20),
           child: Row(
             children: [
               Icon(Icons.pie_chart_rounded, size: 20),

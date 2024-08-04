@@ -20,7 +20,7 @@ class NoInternetConnection extends StatelessWidget {
       theme: lightThemeMethod(lightColorScheme),
       darkTheme: darkThemeMethod(darkColorScheme),
       themeMode: ThemeMode.system,
-      home: View(),
+      home: const View(),
     );
   }
 
@@ -30,7 +30,7 @@ class NoInternetConnection extends StatelessWidget {
       fontFamily: 'Gilroy',
       colorScheme: lightColorScheme,
       primaryColor: lightColorScheme.primary,
-      cardColor: Color(0xFFD9D9D9),
+      cardColor: const Color(0xFFD9D9D9),
       scaffoldBackgroundColor: lightColorScheme.surface,
       appBarTheme: AppBarTheme(
         backgroundColor: lightColorScheme.surface,
@@ -48,7 +48,7 @@ class NoInternetConnection extends StatelessWidget {
       useMaterial3: true,
       colorScheme: darkColorScheme,
       primaryColor: darkColorScheme.primary,
-      cardColor: Color(0xFF262626),
+      cardColor: const Color(0xFF262626),
       scaffoldBackgroundColor: darkColorScheme.surface,
       appBarTheme: AppBarTheme(
         backgroundColor: darkColorScheme.surface,
@@ -80,8 +80,8 @@ class View extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8.0),
                 child: Image.asset(
                   Theme.of(context).brightness == Brightness.dark
-                      ? 'assets/images/SellersFlowDot_logoDarkMode.png'
-                      : 'assets/images/SellersFlowDot_logo.png',
+                      ? 'assets/images/HozSF-white.png'
+                      : 'assets/images/HozSF-blueDark.png',
                   height: 75,
                   fit: BoxFit.cover,
                 ),
@@ -107,19 +107,19 @@ class View extends StatelessWidget {
                         fontSize: 18,
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 15,
                     ),
-                    Text(
+                    const Text(
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
                         "It seems that you're\nnot connected to the internet!"),
-                    SizedBox(
+                    const SizedBox(
                       height: 30,
                     ),
-                    CircularProgressIndicator.adaptive()
+                    const CircularProgressIndicator.adaptive()
                   ],
                 ),
               ),

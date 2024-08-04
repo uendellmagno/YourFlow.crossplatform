@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:your_flow/services/app_state_core.dart';
-import 'package:your_flow/views/homepage/widgets/products_ranking_provider.dart';
+// import 'package:your_flow/views/homepage/widgets/products_ranking_provider.dart';
 import 'package:your_flow/views/homepage/widgets/quick_actions_provider.dart';
 import 'package:your_flow/views/homepage/widgets/quick_insights_provider.dart';
 import 'package:your_flow/views/homepage/widgets/sales_mix_provider.dart';
@@ -19,10 +19,10 @@ class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
   @override
-  _MainScreenState createState() => _MainScreenState();
+  MainScreenState createState() => MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class MainScreenState extends State<MainScreen> {
   final PageController _pageController = PageController();
 
   @override
@@ -98,10 +98,10 @@ class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
   @override
-  _HomeViewState createState() => _HomeViewState();
+  HomeViewState createState() => HomeViewState();
 }
 
-class _HomeViewState extends State<HomeView> {
+class HomeViewState extends State<HomeView> {
   final ApiOps apiOps = ApiOps();
   late Future<Map<String, dynamic>> _future;
 
@@ -135,20 +135,18 @@ class _HomeViewState extends State<HomeView> {
               floating: true,
               pinned: false,
               snap: true,
-              title: Text("YourFlow", style: TextStyle(fontSize: 15)),
+              title: const Text("YourFlow", style: TextStyle(fontSize: 15)),
               centerTitle: true,
               actions: [
                 IconButton(
                   onPressed: () {
                     HapticFeedback.selectionClick();
-
-                    // TODO - Or a Navigator.push()?
-                    showModalBottomSheet(
-                        shape: const BeveledRectangleBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(20))),
-                        context: context,
-                        builder: (context) => const NotificationsView());
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const NotificationsView(),
+                      ),
+                    );
                   },
                   enableFeedback: true,
                   icon: const Icon(Icons.notifications),
@@ -184,19 +182,19 @@ class YFHomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
+    return const SingleChildScrollView(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const UserNameView(),
-          const QuickActionsView(),
-          const Column(
+          UserNameView(),
+          QuickActionsView(),
+          Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               QuickInsightsView(),
               SalesMixView(),
-              ProductsRankingView(),
+              // ProductsRankingView(),
             ],
           ),
         ],

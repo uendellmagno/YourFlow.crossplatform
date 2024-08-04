@@ -27,15 +27,12 @@ class ApiOps {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {
-          print('Request: ${options.method} ${options.path}');
           return handler.next(options);
         },
         onResponse: (response, handler) {
-          print('Response: ${response.statusCode} ${response.data}');
           return handler.next(response);
         },
         onError: (DioException e, handler) {
-          print('Error: ${e.message}');
           return handler.next(e);
         },
       ),
@@ -51,14 +48,13 @@ class ApiOps {
       try {
         final response = await _dio.get(endpoint);
         if (response.statusCode == 200) {
-          print('connected, $response');
           return true;
         } else {
-          print('NOT Connected $response');
+          throw Exception('Failed to connect: ${response.statusCode}');
         }
       } catch (e) {
         if (attempt >= maxRetries) {
-          print('Connection failed after $maxRetries attempts: $e');
+          throw Exception('Failed to connect after $maxRetries attempts');
         }
       }
       await Future.delayed(retryDelay);
