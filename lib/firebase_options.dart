@@ -64,7 +64,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1078170401994',
     projectId: 'sf-dataflow',
     storageBucket: 'sf-dataflow.appspot.com',
-    iosBundleId: 'com.avla.yourflow',
+    iosBundleId: 'com.sellersflow.yourflow',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -73,7 +73,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1078170401994',
     projectId: 'sf-dataflow',
     storageBucket: 'sf-dataflow.appspot.com',
-    iosBundleId: 'com.avlasolutions.yourflow',
+    iosBundleId: 'com.sellersflow.yourflow',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
@@ -85,5 +85,4 @@ class DefaultFirebaseOptions {
     storageBucket: 'sf-dataflow.appspot.com',
     measurementId: 'G-E41480NFFP',
   );
-
 }

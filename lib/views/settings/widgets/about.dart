@@ -4,15 +4,16 @@ class AppInformation {
   final String appName = "YourFlow";
   final String appFullName = "SF YourFlow";
   final String appVersionDetail = "Beta Release: 1.0.0";
-  final String appVersion = "1.0.0";
+  final String appVersion = "0.5.0";
   final String appDescription = " I've got an awesome idea!";
   final Image appIcon = Image.asset(
     'assets/images/256-mac.png',
     width: 48.0,
     height: 48.0,
   );
+  // Made by Uendell Magno - AVLA Solutions, proprietary.
   final String appLegal =
-      "All Rights Reserved®.\nThis is an AVLA App.\nCreated and Managed for SellersFLow LLC ©.";
+      "All Rights Reserved®.\nCreated and Managed for SellersFLow LLC ©.";
 }
 
 class AboutView extends StatelessWidget {

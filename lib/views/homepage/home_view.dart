@@ -103,7 +103,7 @@ class HomeView extends StatefulWidget {
 
 class HomeViewState extends State<HomeView> {
   final ApiOps apiOps = ApiOps();
-  late Future<Map<String, dynamic>> _future;
+  late Future _future;
 
   @override
   void initState() {
@@ -115,7 +115,7 @@ class HomeViewState extends State<HomeView> {
   Future<void> _refresh() async {
     await Provider.of<MyAppState>(context, listen: false).fetchUserName();
     setState(() {
-      _future = apiOps.graphsRevenue();
+      _future = apiOps.forceFreshFetch();
     });
   }
 
@@ -171,7 +171,7 @@ class HomeViewState extends State<HomeView> {
 // This class is the main view of the HomeView() class
 class YFHomeView extends StatelessWidget {
   final ApiOps apiOps;
-  final Future<Map<String, dynamic>> future;
+  final Future future;
   final Future<void> Function() refresh;
 
   const YFHomeView(

@@ -121,8 +121,8 @@ class CustomChart extends State<CChartState> {
             Text(
               _dropdownValue != null
                   ? _dropdownValue!.split('|')[1] == '% Organic'
-                      ? 'Organic Sales'
-                      : _dropdownValue!.split('|')[1]
+                      ? 'Organic Sales per ${_isDailySelected ? 'Day' : 'Month'}'
+                      : '${_dropdownValue!.split('|')[1]} per ${_isDailySelected ? 'Day' : 'Month'}'
                   : "Loading...",
               style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
             ),
@@ -322,10 +322,46 @@ class CustomChart extends State<CChartState> {
           BarChartData(
             barTouchData: BarTouchData(
                 touchTooltipData: BarTouchTooltipData(
-                  fitInsideHorizontally: true,
-                  tooltipHorizontalAlignment: FLHorizontalAlignment.right,
-                  tooltipMargin: -10,
-                ),
+                    fitInsideHorizontally: true,
+                    tooltipHorizontalAlignment: FLHorizontalAlignment.right,
+                    tooltipMargin: -10,
+                    tooltipPadding: const EdgeInsets.all(8),
+                    tooltipRoundedRadius: 12,
+                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                      var key = _dropdownValue?.split('|')[1];
+                      double value = rod.toY;
+
+                      String formattedValue;
+                      if (['Total Sales', 'Price', 'ADS Sales', 'ADS Spend']
+                          .contains(key)) {
+                        formattedValue =
+                            NumberFormat.simpleCurrency().format(value);
+                      } else if ([
+                        '% Organic',
+                        'ROAS',
+                        'CTR',
+                        'TACOS',
+                        'CPC',
+                        'Conversion Rate'
+                      ].contains(key)) {
+                        formattedValue = '${value.toStringAsFixed(2)}%';
+                      } else if (['Units', 'Impressions', 'Clicks']
+                          .contains(key)) {
+                        formattedValue =
+                            NumberFormat.decimalPattern().format(value);
+                      } else {
+                        formattedValue = value
+                            .toString(); // Fallback if key is not recognized
+                      }
+
+                      return BarTooltipItem(
+                        formattedValue,
+                        const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      );
+                    }),
                 touchCallback: (FlTouchEvent event, barTouchResponse) {
                   setState(() {
                     if (!event.isInterestedForInteractions ||
@@ -338,12 +374,21 @@ class CustomChart extends State<CChartState> {
                   });
                 }),
             gridData: const FlGridData(show: false),
-            titlesData: const FlTitlesData(
+            titlesData: FlTitlesData(
               show: true,
-              leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              leftTitles:
+                  const AxisTitles(sideTitles: SideTitles(showTitles: false)),
               rightTitles:
-                  AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              topTitles:
+                  const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  getTitlesWidget: bottomTitles,
+                  reservedSize: 20,
+                ),
+              ),
             ),
             borderData: FlBorderData(show: false),
             barGroups: showingGroups(values),
@@ -354,30 +399,86 @@ class CustomChart extends State<CChartState> {
     return const Center(child: Text('No data available'));
   }
 
+  Widget bottomTitles(double value, TitleMeta meta) {
+    const style = TextStyle(fontSize: 10);
+    String text = '';
+
+    if (_isDailySelected) {
+      // Daily: Show days from 1 to the current day
+      int currentDay = DateTime.now().day;
+      if (value >= 0 && value < currentDay) {
+        text = (value.toInt() + 1).toString();
+      }
+    } else {
+      // Monthly: Show the last 6 months from the current month
+      DateTime now = DateTime.now();
+      List<String> months = [
+        'JAN',
+        'FEB',
+        'MAR',
+        'APR',
+        'MAY',
+        'JUN',
+        'JUL',
+        'AUG',
+        'SEP',
+        'OCT',
+        'NOV',
+        'DEC'
+      ];
+
+      for (int i = 0; i < 6; i++) {
+        int monthIndex = now.month - 1 - i;
+        if (monthIndex < 0) {
+          monthIndex += 12;
+        }
+        if (value.toInt() == 5 - i) {
+          text = months[monthIndex];
+        }
+      }
+    }
+
+    return SideTitleWidget(
+      axisSide: meta.axisSide,
+      child: Text(text, style: style),
+    );
+  }
+
   // This function will build each unique bar group
   BarChartGroupData barGroupData(
     int x,
     double y, {
+    required int totalBars, // Add a parameter for total bars
     bool isTouched = false,
-    double width = 30,
-    List<int> showTooltips = const [],
   }) {
+    double maxBarWidth = 30;
+    double minBarWidth = 8;
+    double calculatedWidth = maxBarWidth;
+
+    // Calculate the bar width based on the total number of bars
+    if (totalBars > 8) {
+      calculatedWidth = (300 / totalBars) - 5; // Dynamic width calculation
+      calculatedWidth = calculatedWidth.clamp(minBarWidth, maxBarWidth);
+    }
+
     return BarChartGroupData(x: x, barRods: [
       BarChartRodData(
         toY: isTouched ? y + 1 : y,
         borderRadius: const BorderRadius.all(Radius.circular(4)),
         color: const Color(0xFF016AA8),
-        width: width,
+        width: calculatedWidth,
       ),
     ]);
   }
 
   // This function will build the bar chart groups
   List<BarChartGroupData> showingGroups(List<dynamic> data) {
+    int totalBars = data.length;
+
     return data.asMap().entries.map((entry) {
       int index = entry.key;
       double value = entry.value.toDouble();
-      return barGroupData(index, value);
+      return barGroupData(index, value, totalBars: totalBars);
     }).toList();
   }
 }

@@ -243,7 +243,7 @@ class QICard extends StatelessWidget {
               child: Container(
                 alignment: Alignment.center,
                 child: Text(
-                  "${value.toStringAsFixed(1)}%",
+                  "${value.toStringAsFixed(0)}%",
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.white,

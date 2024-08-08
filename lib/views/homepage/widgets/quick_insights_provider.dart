@@ -1,3 +1,6 @@
+/// This is the QuickInsightsView() class, it contains the Quick Insight cards and chart.
+library;
+
 import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:your_flow/services/api_ops.dart';
