@@ -57,12 +57,14 @@ class MainScreenState extends State<MainScreen> {
       const SettingsView(),
     ];
 
+
     return Scaffold(
       body: PageView(
         controller: _pageController,
         onPageChanged: (index) {
           appState.setCurrentIndex(index);
         },
+        physics: const NeverScrollableScrollPhysics(),
         children: pages,
       ),
       bottomNavigationBar: Padding(
