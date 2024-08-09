@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:intl/intl.dart';
+import 'package:marquee_text/marquee_text.dart';
 import 'package:your_flow/services/api_ops.dart';
 
 class QICardsState extends StatefulWidget {
@@ -122,17 +123,27 @@ class QICard extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          title,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                        Expanded(
+                          child: MarqueeText(
+                            text: TextSpan(
+                              text: title,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            speed: 15.0,
+                            textAlign: TextAlign.start,
                           ),
                         ),
                         Text(
                           type,
                           style: const TextStyle(
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF9a9a9a),
                           ),

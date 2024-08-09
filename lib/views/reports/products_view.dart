@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:your_flow/services/api_ops.dart';
 
@@ -148,7 +149,7 @@ class _IDayChartState extends State<IDayChartProvider> {
                       ),
                     ),
                     Text(
-                      "Chart Working",
+                      "NUMBER HERE",
                       style: TextStyle(
                         fontSize: 25,
                         fontWeight: FontWeight.bold,
@@ -259,7 +260,7 @@ class IDayChart extends StatelessWidget {
               bottomTitles: AxisTitles(
                 sideTitles: SideTitles(
                   showTitles: true,
-                  interval: 55,
+                  interval: 10,
                 ),
               ),
             ),
@@ -322,23 +323,23 @@ class InventoryMetricsProvider extends State<InventoryMetrics> {
                   children: [
                     MetricsCard(
                       title: "Available Units",
-                      metric: metrics["Available Units"]['current'].toString(),
+                      metric: metrics["Available Units"]['current'],
                     ),
                     MetricsCard(
                       title: "FC Transfer",
-                      metric: metrics["FC Transfer"]['current'].toString(),
+                      metric: metrics["FC Transfer"]['current'],
                     ),
                     MetricsCard(
                       title: "FC Processing",
-                      metric: metrics["FC Processing"]['current'].toString(),
+                      metric: metrics["FC Processing"]['current'],
                     ),
                     MetricsCard(
                       title: "Unfulfillable",
-                      metric: metrics["Unfulfillable"]['current'].toString(),
+                      metric: metrics["Unfulfillable"]['current'],
                     ),
                     MetricsCard(
                       title: "Days of Stock",
-                      metric: metrics["Days of Stock"]['current'].toString(),
+                      metric: metrics["Days of Stock"]['current'],
                     ),
                   ],
                 );
@@ -353,7 +354,7 @@ class InventoryMetricsProvider extends State<InventoryMetrics> {
 
 class MetricsCard extends StatelessWidget {
   final String title;
-  final String metric;
+  final dynamic metric;
 
   const MetricsCard({
     super.key,
@@ -364,7 +365,7 @@ class MetricsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: (MediaQuery.of(context).size.width / 2) - 25,
+      width: (MediaQuery.of(context).size.width / 2) - 15,
       height: 100,
       child: Card(
         elevation: 0,
@@ -380,13 +381,27 @@ class MetricsCard extends StatelessWidget {
                   style: const TextStyle(
                       fontSize: 15, fontWeight: FontWeight.w600)),
             ),
-            Text(metric,
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+            Text(
+              _formatMetric(title, metric),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+            ),
           ],
         ),
       ),
     );
+  }
+
+  String _formatMetric(String title, dynamic metric) {
+    if ([
+      'Available Units',
+      'FC Transfer',
+      'FC Processing',
+      'Unfulfillable',
+      'Days of Stock',
+    ].contains(title)) {
+      return NumberFormat.decimalPattern().format(metric);
+    }
+    return metric.toString(); // Fallback for unrecognized metrics
   }
 }
 

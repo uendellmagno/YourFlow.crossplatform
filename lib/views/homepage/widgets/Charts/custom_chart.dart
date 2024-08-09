@@ -324,12 +324,13 @@ class CustomChart extends State<CChartState> {
                 touchTooltipData: BarTouchTooltipData(
                     fitInsideHorizontally: true,
                     tooltipHorizontalAlignment: FLHorizontalAlignment.right,
-                    tooltipMargin: -10,
+                    // tooltipMargin: -10,
                     tooltipPadding: const EdgeInsets.all(8),
                     tooltipRoundedRadius: 12,
                     getTooltipItem: (group, groupIndex, rod, rodIndex) {
                       var key = _dropdownValue?.split('|')[1];
-                      double value = rod.toY;
+                      bool isTouched = groupIndex == touchedIndex;
+                      double value = rod.toY / (1 + (isTouched ? 0.1 : 0.0));
 
                       String formattedValue;
                       if (['Total Sales', 'Price', 'ADS Sales', 'ADS Spend']
@@ -448,7 +449,7 @@ class CustomChart extends State<CChartState> {
   BarChartGroupData barGroupData(
     int x,
     double y, {
-    required int totalBars, // Add a parameter for total bars
+    required int totalBars,
     bool isTouched = false,
   }) {
     double maxBarWidth = 30;
@@ -457,18 +458,23 @@ class CustomChart extends State<CChartState> {
 
     // Calculate the bar width based on the total number of bars
     if (totalBars > 8) {
-      calculatedWidth = (300 / totalBars) - 5; // Dynamic width calculation
+      calculatedWidth = (300 / totalBars) - 5;
       calculatedWidth = calculatedWidth.clamp(minBarWidth, maxBarWidth);
     }
 
-    return BarChartGroupData(x: x, barRods: [
-      BarChartRodData(
-        toY: isTouched ? y + 1 : y,
-        borderRadius: const BorderRadius.all(Radius.circular(4)),
-        color: const Color(0xFF016AA8),
-        width: calculatedWidth,
-      ),
-    ]);
+    double adjustedY = isTouched ? y + y * 0.1 : y;
+
+    return BarChartGroupData(
+      x: x,
+      barRods: [
+        BarChartRodData(
+          toY: adjustedY,
+          borderRadius: const BorderRadius.all(Radius.circular(4)),
+          color: const Color(0xFF016AA8),
+          width: calculatedWidth,
+        ),
+      ],
+    );
   }
 
   // This function will build the bar chart groups
@@ -478,7 +484,8 @@ class CustomChart extends State<CChartState> {
     return data.asMap().entries.map((entry) {
       int index = entry.key;
       double value = entry.value.toDouble();
-      return barGroupData(index, value, totalBars: totalBars);
+      return barGroupData(index, value,
+          totalBars: totalBars, isTouched: index == touchedIndex);
     }).toList();
   }
 }

@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:your_flow/services/api_ops.dart';
 import 'package:your_flow/services/app_state_core.dart';
 import 'package:your_flow/views/settings/widgets/about.dart';
 
@@ -14,9 +16,7 @@ class SettingsView extends StatelessWidget {
       appBar: AppBar(
         title: const Text(
           'Settings',
-          style: TextStyle(
-            fontSize: 18,
-          ),
+          style: TextStyle(fontSize: 18),
         ),
         centerTitle: true,
       ),
@@ -24,12 +24,7 @@ class SettingsView extends StatelessWidget {
         padding: EdgeInsets.all(8.0),
         child: SingleChildScrollView(
           physics: BouncingScrollPhysics(),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              SettingsListBuilder(),
-            ],
-          ),
+          child: SettingsListBuilder(),
         ),
       ),
     );
@@ -38,16 +33,22 @@ class SettingsView extends StatelessWidget {
 
 class SettingsListBuilder extends StatelessWidget {
   const SettingsListBuilder({super.key});
-
+// TODO - SLACK - Add a method to get the profile picture URL
   @override
   Widget build(BuildContext context) {
+    final ApiOps apiOps = ApiOps();
+    print(apiOps.userInfo());
     final appState = Provider.of<MyAppState>(context);
-    return Column(
-      children: [
-        ListBody(
+    return FutureBuilder<String>(
+      future: _getProfilePictureUrl(appState.userName),
+      builder: (context, snapshot) {
+        String profileUrl = snapshot.data ??
+            'https://ui-avatars.com/api/?name=${Uri.encodeComponent(appState.userName)}';
+
+        return Column(
           children: [
             SettingsCard(
-              image: 'https://avatars.githubusercontent.com/u/29775873?v=4',
+              image: profileUrl,
               title: appState.userName,
               subtitle: 'View and edit your profile',
               view: const Text('Profile'),
@@ -71,23 +72,41 @@ class SettingsListBuilder extends StatelessWidget {
                 );
               },
             ),
+            SettingsCard(
+              title: 'Logout',
+              subtitle: 'Logout from your account',
+              view: const Text('Logout'),
+              tileType: 'logout',
+              tapGesture: () {
+                _showLogoutDialog(context, appState);
+              },
+            ),
           ],
-        ),
-        SettingsCard(
-          title: 'Logout',
-          subtitle: 'Logout from your account',
-          view: const Text('Logout'),
-          tileType: 'logout',
-          tapGesture: () {
-            logoutDialog(context, appState);
-          },
-        ),
-      ],
+        );
+      },
     );
   }
 
-  Future<dynamic> logoutDialog(BuildContext context, MyAppState appState) {
-    return showDialog(
+  Future<String> _getProfilePictureUrl(String userName) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return '';
+
+    final uid = user.uid;
+    final profilePicRef = FirebaseStorage.instance
+        .ref()
+        .child('SF-DataFlow/assets/logos/$uid/$uid.jpg');
+
+    try {
+      final url = await profilePicRef.getDownloadURL();
+      return url;
+    } catch (error) {
+      return 'https://ui-avatars.com/api/?name=${Uri.encodeComponent(user.displayName ?? userName)}';
+    }
+  }
+
+  Future<void> _showLogoutDialog(
+      BuildContext context, MyAppState appState) async {
+    return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -108,9 +127,7 @@ class SettingsListBuilder extends StatelessWidget {
               },
               child: Text(
                 'Cancel',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.error,
-                ),
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
               ),
             ),
           ],
@@ -142,54 +159,19 @@ class SettingsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget leadingWidget;
-
-    switch (tileType) {
-      case 'profile':
-        leadingWidget = ClipOval(
-          child: Image.network(
-            image!,
-            width: 50,
-            height: 50,
-            fit: BoxFit.cover,
-          ),
-        );
-        break;
-      case 'settings':
-        leadingWidget = const Icon(Icons.settings);
-        break;
-      case 'about':
-        leadingWidget = const Icon(Icons.info);
-        break;
-      case 'help':
-        leadingWidget = const Icon(Icons.help);
-        break;
-      case 'logout':
-        leadingWidget = const Icon(Icons.logout);
-        break;
-      default:
-        leadingWidget = const Icon(Icons.info);
-        break;
-    }
+    final leadingWidget = _getLeadingWidget(tileType);
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0, top: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: ElevatedButton.icon(
         style: ElevatedButton.styleFrom(
-            shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        )),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
         onPressed: () {
           HapticFeedback.lightImpact();
-          if (tapGesture != null) {
-            tapGesture!();
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('This feature is coming soon! Stay tuned.'),
-              ),
-            );
-          }
+          tapGesture != null ? tapGesture!() : _showComingSoon(context);
         },
         icon: leadingWidget,
         label: ListTile(
@@ -198,20 +180,47 @@ class SettingsCard extends StatelessWidget {
           ),
           title: Text(
             title,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           subtitle: subtitle != null
-              ? Text(
-                  subtitle!,
-                  style: const TextStyle(
-                    fontSize: 14,
-                  ),
-                )
+              ? Text(subtitle!, style: const TextStyle(fontSize: 14))
               : null,
         ),
+      ),
+    );
+  }
+
+  Widget _getLeadingWidget(String tileType) {
+    switch (tileType) {
+      case 'profile':
+        return ClipOval(
+          child: Image.network(
+            image!,
+            width: 50,
+            height: 50,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              return const Icon(Icons.account_circle, size: 50);
+            },
+          ),
+        );
+      case 'settings':
+        return const Icon(Icons.settings);
+      case 'about':
+        return const Icon(Icons.info);
+      case 'help':
+        return const Icon(Icons.help);
+      case 'logout':
+        return const Icon(Icons.logout);
+      default:
+        return const Icon(Icons.info);
+    }
+  }
+
+  void _showComingSoon(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('This feature is coming soon! Stay tuned.'),
       ),
     );
   }
