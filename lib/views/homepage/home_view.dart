@@ -23,7 +23,27 @@ class MainScreen extends StatefulWidget {
 }
 
 class MainScreenState extends State<MainScreen> {
-  final PageController _pageController = PageController();
+  late PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    final appState = Provider.of<MyAppState>(context, listen: false);
+    _pageController = PageController(initialPage: appState.currentIndex);
+
+    _pageController.addListener(() {
+      final int pageIndex = _pageController.page?.round() ?? 0;
+      if (appState.currentIndex != pageIndex) {
+        appState.setCurrentIndex(pageIndex);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +59,6 @@ class MainScreenState extends State<MainScreen> {
 
     return Scaffold(
       body: PageView(
-        physics: const NeverScrollableScrollPhysics(),
         controller: _pageController,
         onPageChanged: (index) {
           appState.setCurrentIndex(index);
@@ -63,6 +82,7 @@ class MainScreenState extends State<MainScreen> {
           padding: const EdgeInsets.all(16),
           selectedIndex: appState.currentIndex,
           onTabChange: (int newIndex) {
+            appState.setCurrentIndex(newIndex);
             _pageController.jumpToPage(newIndex);
           },
           tabs: const [
@@ -103,7 +123,7 @@ class HomeView extends StatefulWidget {
 
 class HomeViewState extends State<HomeView> {
   final ApiOps apiOps = ApiOps();
-  late Future<Map<String, dynamic>> _future;
+  late Future _future;
 
   @override
   void initState() {
@@ -115,7 +135,7 @@ class HomeViewState extends State<HomeView> {
   Future<void> _refresh() async {
     await Provider.of<MyAppState>(context, listen: false).fetchUserName();
     setState(() {
-      _future = apiOps.graphsRevenue();
+      _future = apiOps.forceFreshFetch();
     });
   }
 
@@ -171,7 +191,7 @@ class HomeViewState extends State<HomeView> {
 // This class is the main view of the HomeView() class
 class YFHomeView extends StatelessWidget {
   final ApiOps apiOps;
-  final Future<Map<String, dynamic>> future;
+  final Future future;
   final Future<void> Function() refresh;
 
   const YFHomeView(

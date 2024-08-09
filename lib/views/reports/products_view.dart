@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:your_flow/services/api_ops.dart';
 
@@ -19,10 +20,6 @@ class ProductsView extends StatelessWidget {
         ),
         centerTitle: true,
         actions: [
-          // IconButton(
-          //   icon: Icon(Icons.search_rounded),
-          //   onPressed: () {},
-          // ),
           IconButton(
             icon: const Icon(Icons.filter_alt_rounded),
             onPressed: () {
@@ -65,7 +62,7 @@ class YFInventoryView extends StatelessWidget {
               children: [
                 IDayChartView(apiOps: apiOps),
                 const SizedBox(height: 15),
-                InventoryMetrics(),
+                InventoryMetrics(apiOps: apiOps),
                 const SizedBox(height: 15),
                 const ReviewsSummary(),
                 const SizedBox(height: 15),
@@ -79,7 +76,6 @@ class YFInventoryView extends StatelessWidget {
   }
 }
 
-// This is the Inventory by Day widget that contains the chart
 class IDayChartView extends StatelessWidget {
   final ApiOps apiOps;
   const IDayChartView({super.key, required this.apiOps});
@@ -153,7 +149,7 @@ class _IDayChartState extends State<IDayChartProvider> {
                       ),
                     ),
                     Text(
-                      "263,265",
+                      "NUMBER HERE",
                       style: TextStyle(
                         fontSize: 25,
                         fontWeight: FontWeight.bold,
@@ -264,7 +260,7 @@ class IDayChart extends StatelessWidget {
               bottomTitles: AxisTitles(
                 sideTitles: SideTitles(
                   showTitles: true,
-                  interval: 55,
+                  interval: 10,
                 ),
               ),
             ),
@@ -275,17 +271,28 @@ class IDayChart extends StatelessWidget {
   }
 }
 
-// This is the Inventory Metrics widget that contains the metrics cards
-class InventoryMetrics extends StatelessWidget {
-  InventoryMetrics({super.key});
+class InventoryMetrics extends StatefulWidget {
+  final ApiOps apiOps;
+  const InventoryMetrics({super.key, required this.apiOps});
 
-  final ApiOps apiOps = ApiOps();
+  @override
+  State<InventoryMetrics> createState() => InventoryMetricsProvider();
+}
+
+class InventoryMetricsProvider extends State<InventoryMetrics> {
+  late Future<Map<String, dynamic>> data;
+
+  @override
+  void initState() {
+    super.initState();
+    data = widget.apiOps.cardsInventory();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       children: [
-        Padding(
+        const Padding(
           padding: EdgeInsets.only(left: 20, top: 20),
           child: Row(
             children: [
@@ -296,36 +303,48 @@ class InventoryMetrics extends StatelessWidget {
           ),
         ),
         Padding(
-          padding: EdgeInsets.only(top: 20, bottom: 20),
-          child: Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: [
-              MetricsCard(
-                title: "Available Units",
-                metric: "48,432",
-              ),
-              MetricsCard(
-                title: "FC Transfer",
-                metric: "5,922",
-              ),
-              MetricsCard(
-                title: "FC Processing",
-                metric: "2,364",
-              ),
-              MetricsCard(
-                title: "Unfulfillable",
-                metric: "592",
-              ),
-              MetricsCard(
-                title: "Units Sold",
-                metric: "2,000",
-              ),
-              MetricsCard(
-                title: "Days of Stock",
-                metric: "211.68",
-              ),
-            ],
+          padding: const EdgeInsets.only(top: 20, bottom: 20),
+          child: FutureBuilder<Map<String, dynamic>>(
+            future: data,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(
+                  child: LoadingAnimationWidget.waveDots(
+                      color: Theme.of(context).primaryColor, size: 40),
+                );
+              } else if (snapshot.hasError) {
+                return const Center(child: Text('Error loading data'));
+              } else {
+                final metrics = snapshot.data!['Inventory'];
+                // print(metrics);
+                return Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: [
+                    MetricsCard(
+                      title: "Available Units",
+                      metric: metrics["Available Units"]['current'],
+                    ),
+                    MetricsCard(
+                      title: "FC Transfer",
+                      metric: metrics["FC Transfer"]['current'],
+                    ),
+                    MetricsCard(
+                      title: "FC Processing",
+                      metric: metrics["FC Processing"]['current'],
+                    ),
+                    MetricsCard(
+                      title: "Unfulfillable",
+                      metric: metrics["Unfulfillable"]['current'],
+                    ),
+                    MetricsCard(
+                      title: "Days of Stock",
+                      metric: metrics["Days of Stock"]['current'],
+                    ),
+                  ],
+                );
+              }
+            },
           ),
         ),
       ],
@@ -335,7 +354,8 @@ class InventoryMetrics extends StatelessWidget {
 
 class MetricsCard extends StatelessWidget {
   final String title;
-  final String metric;
+  final dynamic metric;
+
   const MetricsCard({
     super.key,
     required this.title,
@@ -345,33 +365,46 @@ class MetricsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: (MediaQuery.of(context).size.width / 2) -
-          25, // Adjust the width as needed
-      height: 100, // Set the desired height
+      width: (MediaQuery.of(context).size.width / 2) - 15,
+      height: 100,
       child: Card(
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15),
         ),
         child: Column(
-          mainAxisAlignment:
-              MainAxisAlignment.center, // Center content vertically
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Padding(
               padding: const EdgeInsets.only(top: 10),
               child: Text(title,
-                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                  style: const TextStyle(
+                      fontSize: 15, fontWeight: FontWeight.w600)),
             ),
-            Text(metric,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+            Text(
+              _formatMetric(title, metric),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+            ),
           ],
         ),
       ),
     );
   }
+
+  String _formatMetric(String title, dynamic metric) {
+    if ([
+      'Available Units',
+      'FC Transfer',
+      'FC Processing',
+      'Unfulfillable',
+      'Days of Stock',
+    ].contains(title)) {
+      return NumberFormat.decimalPattern().format(metric);
+    }
+    return metric.toString(); // Fallback for unrecognized metrics
+  }
 }
 
-// This is the Reviews Summary widget that contains the reviews summary button that leads to the reviews_view.dart
 class ReviewsSummary extends StatelessWidget {
   const ReviewsSummary({super.key});
 
@@ -400,7 +433,6 @@ class ReviewsSummary extends StatelessWidget {
   }
 }
 
-// This is the Global Products Ranking widget that contains the ranking of the best 3 selling products
 class ProductsRanking extends StatelessWidget {
   const ProductsRanking({super.key});
 

@@ -32,14 +32,20 @@ class SalesView extends StatelessWidget {
                   ),
                 ),
                 onPressed: () {
-                  showBottomSheet(
-                    context: context,
-                    showDragHandle: true,
-                    enableDrag: true,
-                    constraints: BoxConstraints(
-                      maxHeight: MediaQuery.of(context).size.height - 150,
+                  // showBottomSheet(
+                  //   context: context,
+                  //   showDragHandle: true,
+                  //   enableDrag: true,
+                  //   constraints: BoxConstraints(
+                  //     maxHeight: MediaQuery.of(context).size.height - 150,
+                  //   ),
+                  //   builder: (context) => const TemporaryView(),
+                  // );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const TemporaryView(),
                     ),
-                    builder: (context) => const TemporaryView(),
                   );
                 },
                 child: const Padding(

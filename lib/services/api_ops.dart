@@ -6,6 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiOps {
   static const String path = "https://sellerflow.com.br:8443";
+  // static const String path = "http://127.0.0.1:8000";
+
   static const int maxRetries = 5;
   static const Duration retryDelay = Duration(seconds: 5);
   static const Duration requestTimeout = Duration(seconds: 30);
@@ -73,9 +75,20 @@ class ApiOps {
   }
 
   String getUrlFilter() {
-    return filter.entries
-        .map((e) => '&${e.key}=${e.value.replaceAll('&', '%26')}')
-        .join();
+    String urlResponse = "";
+
+    filter.forEach((key, value) {
+      if (key == "date") {
+        var parts = value.split("/");
+        var month = parts[0];
+        var year = parts[1];
+        urlResponse += "&month=$month&year=$year";
+      } else {
+        urlResponse += "&$key=${value.replaceAll('&', '%26')}";
+      }
+    });
+
+    return urlResponse;
   }
 
   Future<Map<String, dynamic>> mountRequest(String endpoint) async {
